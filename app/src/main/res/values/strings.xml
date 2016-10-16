@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">My OMDB</string>
+    <string name="tab1">MOVIES</string>
+    <string name="tab2">WATCH LIST</string>
+    <string name="tab3">FAVORITES</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="searchable">Searchable</string>
+    <string name="menu_search">Searchable</string>
+</resources>
