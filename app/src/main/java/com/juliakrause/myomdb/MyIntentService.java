@@ -33,16 +33,16 @@ import static android.provider.ContactsContract.Intents.Insert.ACTION;
  * helper methods.
  */
 public class MyIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    //private static final String ACTION_FOO = "com.juliakrause.myomdb.action.FOO";
-    //private static final String ACTION_BAZ = "com.juliakrause.myomdb.action.BAZ";
 
-    // TODO: Rename parameters
+    private static final String ACTION_SEARCHOMDB = "com.juliakrause.myomdb.action.SEARCHOMDB";
+    private static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.action.GET_DETAILS";
+
     //private static final String EXTRA_PARAM1 = "com.juliakrause.myomdb.extra.PARAM1";
     //private static final String EXTRA_PARAM2 = "com.juliakrause.myomdb.extra.PARAM2";
-    private static String URL_BASE = "http://omdbapi.com";
+
+    private static final String URL_BASE = "http://omdbapi.com";
     private String url;
+    private JsonObjectRequest myRequest;
     private Handler handler;
 
     public MyIntentService() {
@@ -97,26 +97,54 @@ public class MyIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         System.out.println("this is the intent service's onHandleIntent method");
         if (intent != null) {
-            String val = intent.getStringExtra("query");
-            url = URL_BASE + val;
-            System.out.println(url);
-
             System.out.println("intent is not null");
+
             RequestQueue queue = Volley.newRequestQueue(this);
-            JsonObjectRequest myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                JSONArray jsonArray = response.getJSONArray("Search");
-                                System.out.println(jsonArray.length());
-                                List<String> list = new ArrayList<String>();
-                                for(int i = 0; i < jsonArray.length(); i++) {
-                                    list.add(jsonArray.getJSONObject(i).getString("Title"));
-                                }
-                                for(String title : list) {
-                                    System.out.println(title);
-                                    //handler.handleMessage(title);
+
+            final String action = intent.getAction();
+            System.out.println(action);
+            //System.out.println(ACTION_SEARCHOMDB);
+            if (ACTION_SEARCHOMDB.equals(action)) {
+                String val = intent.getStringExtra("query");
+                url = URL_BASE + "/?s=" + val;
+                handleActionSearch();
+            } else if (ACTION_GET_DETAILS.equals(action)) {
+                String val = intent.getStringExtra("query");
+                url = URL_BASE + "/?i=" + val;
+                handleActionGetDetails();
+            }
+
+            queue.add(myRequest);
+
+        }
+    }
+
+    /**
+     * Handle action Search in the provided background thread
+     */
+    private void handleActionSearch() {
+        System.out.println("Url is: " + url);
+
+        myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("Search");
+                            System.out.println(jsonArray.length());
+                            List<String> list = new ArrayList<String>();
+                            for(int i = 0; i < jsonArray.length(); i++) {
+                                list.add(jsonArray.getJSONObject(i).getString("Title"));
+                            }
+                            for(String title : list) {
+                                System.out.println(title);
+
+                                //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
+                                //hier kommt das Request rein
+                                //fuer Liste mit /?s=string
+                                //fuer details zu film mit /?i=id von item
+
+                                //handler.handleMessage(title);
 
                                     /*Intent in = new Intent(ACTION);
                                     in.putExtra("resultCode", MainActivity.RESULT_OK);
@@ -124,68 +152,96 @@ public class MyIntentService extends IntentService {
                                     // Fire the broadcast with intent packaged
                                     LocalBroadcastManager.getInstance(this).sendBroadcast;*/
 
-                                }
-                                //System.out.println(jsonArray.toString());
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                            //String responseString = response.toString();
+                            //System.out.println(jsonArray.toString());
 
-                            //System.out.println(responseString);
-                            //stattdessen hier nur den Titel ausgeben
-                            //GSON benutzen
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            if(error.networkResponse != null) {
-                                if (error.networkResponse.statusCode == 404) {
-                                    System.out.println("this is the error listener");
-                                }
-                            } else {
-                                System.out.println("error.networkResponse is null");
+                        //String responseString = response.toString();
+
+                        //System.out.println(responseString);
+                        //stattdessen hier nur den Titel ausgeben
+                        //GSON benutzen
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if(error.networkResponse != null) {
+                            if (error.networkResponse.statusCode == 404) {
+                                System.out.println("this is the error listener");
                             }
+                        } else {
+                            System.out.println("error.networkResponse is null");
                         }
-                    });
-            queue.add(myRequest);
+                    }
+                });
 
-            //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
-            //hier kommt das Request rein
-            //fuer Liste mit /?s=string
-            //fuer details zu film mit /?i=id von item
-
-
-            final String action = intent.getAction();
-            /*if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
-            }*/
-        }
     }
 
     /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
+     * Handle action getDetails in the provided background thread
      */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void handleActionGetDetails() {
+        System.out.println("Url is: " + url);
+
+        myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //JSONObject jsonObject = response.getJSONObject(null);
+                            //System.out.println(jsonObject.length());
+                            List<String> list = new ArrayList<String>();
+                            list.add(response.getString("Title"));
+                            list.add(response.getString("Genre"));
+                            list.add(response.getString("Writer"));
+                            list.add(response.getString("Actors"));
+
+                            for(String title : list) {
+                                System.out.println(title);
+
+                                //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
+                                //hier kommt das Request rein
+                                //fuer Liste mit /?s=string
+                                //fuer details zu film mit /?i=id von item
+
+                                //handler.handleMessage(title);
+
+                                    /*Intent in = new Intent(ACTION);
+                                    in.putExtra("resultCode", MainActivity.RESULT_OK);
+                                    in.putExtra("resultValue", "My Result Value. Passed in: " + title);
+                                    // Fire the broadcast with intent packaged
+                                    LocalBroadcastManager.getInstance(this).sendBroadcast;*/
+
+                            }
+                            //System.out.println(jsonArray.toString());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        //String responseString = response.toString();
+
+                        //System.out.println(responseString);
+                        //stattdessen hier nur den Titel ausgeben
+                        //GSON benutzen
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if(error.networkResponse != null) {
+                            if (error.networkResponse.statusCode == 404) {
+                                System.out.println("this is the error listener");
+                            }
+                        } else {
+                            System.out.println("error.networkResponse is null");
+                        }
+                    }
+                });
+
     }
 
 }
