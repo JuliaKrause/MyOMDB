@@ -54,7 +54,8 @@ public class MyIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("This is the onCreate Method in the intentService");
+        System.out.println("This is the onCreate Method in the intentService--THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
         handler = new Handler();
         //hier Handler konstruieren, diesen dann in onHandleIntent Methode aufrufen
     }
@@ -95,7 +96,8 @@ public class MyIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        System.out.println("this is the intent service's onHandleIntent method");
+        System.out.println("this is the intent service's onHandleIntent method--THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
         if (intent != null) {
             System.out.println("intent is not null");
 
@@ -124,7 +126,8 @@ public class MyIntentService extends IntentService {
      */
     private void handleActionSearch() {
         System.out.println("Url is: " + url);
-
+        System.out.println("THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
         myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -134,10 +137,21 @@ public class MyIntentService extends IntentService {
                             System.out.println(jsonArray.length());
                             List<String> list = new ArrayList<String>();
                             for(int i = 0; i < jsonArray.length(); i++) {
-                                list.add(jsonArray.getJSONObject(i).getString("Title"));
+                                StringBuilder sb = new StringBuilder();
+                                sb.append(jsonArray.getJSONObject(i).getString("Title"));
+                                sb.append(", ");
+                                sb.append(jsonArray.getJSONObject(i).getString("Year"));
+                                sb.append(", ");
+                                sb.append(jsonArray.getJSONObject(i).getString("Type"));
+                                sb.append(", ");
+                                sb.append(jsonArray.getJSONObject(i).getString("imdbID"));
+                                list.add(sb.toString().trim());
                             }
-                            for(String title : list) {
-                                System.out.println(title);
+                            for(String entry : list) {
+                                System.out.println(entry);
+                                //fuer jeden Eintrag Info: title, year, id, type
+                                //id wollen wir natürlich nicht in der Liste zeigen
+
 
                                 //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
                                 //hier kommt das Request rein
@@ -186,6 +200,8 @@ public class MyIntentService extends IntentService {
 
     private void handleActionGetDetails() {
         System.out.println("Url is: " + url);
+        System.out.println("THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
 
         myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -241,6 +257,15 @@ public class MyIntentService extends IntentService {
                         }
                     }
                 });
+
+    }
+
+    @Override
+    public void onDestroy() {
+        System.out.println("intent service is being destroyed");//weirdly, this happens before the sysout in the handle methods
+        System.out.println("THREAD IS: ");//is again the UI Thread
+        System.out.println(Thread.currentThread().getId());
+        super.onDestroy();
 
     }
 

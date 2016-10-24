@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.juliakrause.myomdb.dummy.DummyContent;
 
-//TODO: find out how I can know what thread I'm in
 //TODO: get result of search to main activity
 //TODO: get result of search from main activity in list fragment
 //TODO: think about what you just did and do it better (a handler and/or a broadcast receiver
@@ -51,6 +50,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         //to persist data, I guess I need some variables at the beginning, which I instantiate in onCreate()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        System.out.println("THREAD IS: ");
+        System.out.println(Thread.currentThread().getId());
 
     }
 
@@ -115,8 +118,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextSubmit(String query) {
         System.out.println("Query is: " + query);
         Intent intent = new Intent(this, MyIntentService.class);
-        //intent.setAction(ACTION_SEARCHOMDB);
-        intent.setAction(ACTION_GET_DETAILS);
+        intent.setAction(ACTION_SEARCHOMDB);
+        //intent.setAction(ACTION_GET_DETAILS);
         intent.putExtra("query", query);
         //intent.putExtra("query", "tt2661044");
         startService(intent);
