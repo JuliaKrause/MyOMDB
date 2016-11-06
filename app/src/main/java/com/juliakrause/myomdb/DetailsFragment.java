@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link InfoFragment.OnFragmentInteractionListener} interface
+ * {@link DetailsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link InfoFragment#newInstance} factory method to
+ * Use the {@link DetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InfoFragment extends Fragment {
+public class DetailsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +29,7 @@ public class InfoFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public InfoFragment() {
+    public DetailsFragment() {
         // Required empty public constructor
     }
 
@@ -39,11 +39,11 @@ public class InfoFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment InfoFragment.
+     * @return A new instance of fragment DetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static InfoFragment newInstance(String param1, String param2) {
-        InfoFragment fragment = new InfoFragment();
+    public static DetailsFragment newInstance(String param1, String param2) {
+        DetailsFragment fragment = new DetailsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -64,7 +64,7 @@ public class InfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_info, container, false);
+        return inflater.inflate(R.layout.fragment_details, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -89,7 +89,7 @@ public class InfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        System.out.println("infoFragment has been detached");
+        System.out.println("detailsFragment has been detached");
     }
 
     /**
@@ -110,7 +110,7 @@ public class InfoFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("infoFragment has been paused");
+        System.out.println("detailsFragment has been paused");
         //commit changes that should be persisted
     }
 

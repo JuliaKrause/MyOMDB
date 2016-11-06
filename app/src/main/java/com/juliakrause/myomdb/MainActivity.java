@@ -6,14 +6,22 @@ import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+
+import android.net.Uri;
 import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
-import android.widget.Toast;
+
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.juliakrause.myomdb.dummy.DummyContent;
 
@@ -26,6 +34,7 @@ import com.juliakrause.myomdb.dummy.DummyContent;
 //TODO: make github repo
 //TODO: do something to test that different tab shows different list
 //TODO: e.g. favorites tab could show dummy list or such
+
 //TODO: now the time for local data has come
 //TODO: do not freak out because after a month of this, you're still only done with part 1
 //TODO: find out where these lines come from:
@@ -37,15 +46,14 @@ public class MainActivity extends AppCompatActivity
         ItemFragment.OnListFragmentInteractionListener,
         SearchView.OnQueryTextListener {
 
-    private MyBroadcastReceiver receiver = new MyBroadcastReceiver();
-    private SearchView searchView;
     private static final String ACTION_SEARCHOMDB = "com.juliakrause.myomdb.action.SEARCHOMDB";
     private static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.action.GET_DETAILS";
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
+    private static final String FRAGMENT_TAG_LIST = "com.juliakrause.myomdb.fragment.tag.LIST";
+    private static final String FRAGMENT_TAG_DETAILS = "com.juliakrause.myomdb.fragment.tag.DETAILS";
+    private MyBroadcastReceiver receiver;
+    private SearchView searchView;
+    private Messenger detailsMessenger;
+    private Messenger searchMessenger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +81,9 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = ItemFragment.newInstance(1);
         fragmentTransaction.add(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
+        //detailsMessenger = new Messenger(new DetailsHandler());
+        //searchMessenger = new Messenger(new SearchHandler());
+        receiver = new MyBroadcastReceiver(this);
     }
 
     //in onResume(), bind activity to services, manipulate fragments, register broadcast receiver
@@ -80,9 +91,8 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         //not sure why I would create an IntentFilter here and not in the manifest file
-        //IntentFilter filter = new IntentFilter(MyIntentService.);
-        //LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
-
+        IntentFilter filter = new IntentFilter(MyBroadcastReceiver.ACTION_LOAD_DETAILS);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(this);
     }
@@ -97,17 +107,10 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    // Define the callback for what to do when data is received
-    private BroadcastReceiver testReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int resultCode = intent.getIntExtra("resultCode", RESULT_CANCELED);
-            if (resultCode == RESULT_OK) {
-                String resultValue = intent.getStringExtra("resultValue");
-                Toast.makeText(MainActivity.this, resultValue, Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
@@ -130,4 +133,44 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String newText) {
         return false;
     }
+
+    //TODO: ich glaube, ich will mir die Handler lieber direkt im Intent Service machen
+    /*private class DetailsHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            Movie movie = msg.getData().getParcelable(DownloadService.MESSAGE_DETAILS);
+            showDetails(movie);
+        }
+    }
+
+    private class SearchHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            ArrayList<Movie> movies = msg.getData().getParcelableArrayList(DownloadService.MESSAGE_SEARCH_RESULT);
+            Intent intent = new Intent(MovieListFragmentBroadcastReceiver.ACTION_SHOW_SEARCH_RESULT);
+            intent.putParcelableArrayListExtra(MovieListFragmentBroadcastReceiver.EXTRA_SEARCH_RESULT, movies);
+            LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
+        }
+    }
+
+    public void loadDetails(String imdbID) {
+        DownloadService.startActionLoadDetails(this, imdbID, detailsMessenger);
+    }
+
+    public void showDetails(Movie movie) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        DetailsFragment details = DetailsFragment.newInstance(movie);
+        fragmentTransaction.replace(R.id.fragmentContainer, details, FRAGMENT_TAG_DETAILS);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    public void onSearchClick(View view) {
+        showList();
+        String title = ((EditText) findViewById(R.id.editTextSearch)).getText().toString();
+        DownloadService.startActionSearch(this, title, searchMessenger);
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }*/
 }
