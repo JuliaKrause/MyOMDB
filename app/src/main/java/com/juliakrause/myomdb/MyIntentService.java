@@ -1,10 +1,13 @@
 package com.juliakrause.myomdb;
 
-import android.app.DownloadManager;
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.*;
 
@@ -22,8 +25,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.provider.ContactsContract.Intents.Insert.ACTION;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -36,17 +39,57 @@ public class MyIntentService extends IntentService {
 
     private static final String ACTION_SEARCHOMDB = "com.juliakrause.myomdb.action.SEARCHOMDB";
     private static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.action.GET_DETAILS";
+    private static final String EXTRA_TITLE = "com.juliakrause.myomdb.extra.TITLE";
+    private static final String EXTRA_IMDBID = "com.juliakrause.myomdb.extra.IMDBID";
+    private static final String EXTRA_MESSENGER = "com.juliakrause.myomdb.extra.MESSENGER";
 
-    //private static final String EXTRA_PARAM1 = "com.juliakrause.myomdb.extra.PARAM1";
-    //private static final String EXTRA_PARAM2 = "com.juliakrause.myomdb.extra.PARAM2";
+    private static final String OMDB_SUCCESS = "Response";
+    private static final String OMDB_ID = "imdbID";
+    private static final String OMDB_TITLE = "Title";
+    private static final String OMDB_YEAR = "Year";
+    private static final String OMDB_RATED = "Rated";
+    private static final String OMDB_RELEASED = "Released";
+    private static final String OMDB_RUNTIME = "Runtime";
+    private static final String OMDB_GENRE = "Genre";
+    private static final String OMDB_DIRECTOR = "Director";
+    private static final String OMDB_WRITER = "Writer";
+    private static final String OMDB_ACTORS = "Actors";
+    private static final String OMDB_PLOT = "Plot";
+    private static final String OMDB_TYPE = "Type";
+    private static final String OMDB_SEARCH_RESULT = "Search";
+
+    public static final String MESSAGE_SEARCH_RESULT = "com.juliakrause.myomdb.message.SEARCH_RESULT";
+    public static final String MESSAGE_DETAILS = "com.juliakrause.myomdb.message.DETAILS";
 
     private static final String URL_BASE = "http://omdbapi.com";
-    private String url;
-    private JsonObjectRequest myRequest;
-    private Handler handler;
+    private Messenger detailsMessenger;
+    private Messenger searchMessenger;
 
     public MyIntentService() {
         super("MyIntentService");
+    }
+
+    private class SearchHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            ArrayList<Movie> movies = msg.getData().getParcelableArrayList(MESSAGE_SEARCH_RESULT);
+            Intent intent = new Intent(MovieListFragmentBroadcastReceiver.ACTION_SHOW_SEARCH_RESULT);
+            intent.putParcelableArrayListExtra(MovieListFragmentBroadcastReceiver.EXTRA_SEARCH_RESULT, movies);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
+    }
+
+    private class DetailsHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            Movie movie = msg.getData().getParcelable(MESSAGE_DETAILS);
+            ArrayList<Movie> movieList = new ArrayList<>();
+            movieList.add(movie);
+            Intent intent = new Intent(MainBroadcastReceiver.ACTION_LOAD_DETAILS);
+            intent.putParcelableArrayListExtra(MainBroadcastReceiver.EXTRA_MOVIE, movieList);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+           // getApplicationContext().prepareDetails(movie);
+        }
     }
 
     //diese Methode läuft noch im UI Thread
@@ -56,127 +99,56 @@ public class MyIntentService extends IntentService {
         super.onCreate();
         System.out.println("This is the onCreate Method in the intentService--THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
-        handler = new Handler();
-        //hier Handler konstruieren, diesen dann in onHandleIntent Methode aufrufen
+
+        detailsMessenger = new Messenger(new DetailsHandler());
+        searchMessenger = new Messenger(new SearchHandler());
     }
-
-    public void onStartCommand() {
-
-    }
-
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    /*public static void startActionFoo(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, MyIntentService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }*/
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    /*public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, MyIntentService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }*/
 
     @Override
     protected void onHandleIntent(Intent intent) {
         System.out.println("this is the intent service's onHandleIntent method--THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
+
         if (intent != null) {
-            System.out.println("intent is not null");
-
-            RequestQueue queue = Volley.newRequestQueue(this);
-
             final String action = intent.getAction();
-            System.out.println(action);
-            //System.out.println(ACTION_SEARCHOMDB);
+
             if (ACTION_SEARCHOMDB.equals(action)) {
-                String val = intent.getStringExtra("query");
-                url = URL_BASE + "/?s=" + val;
-                handleActionSearch();
+                final String title = intent.getStringExtra(EXTRA_TITLE);
+                handleActionSearch(title);
             } else if (ACTION_GET_DETAILS.equals(action)) {
-                String val = intent.getStringExtra("query");
-                url = URL_BASE + "/?i=" + val;
-                handleActionGetDetails();
+                final String imdbid = intent.getStringExtra(EXTRA_IMDBID);
+                handleActionGetDetails(imdbid);
             }
-
-            queue.add(myRequest);
-
         }
     }
 
     /**
      * Handle action Search in the provided background thread
      */
-    private void handleActionSearch() {
+    private void handleActionSearch(String title) {
+        String url = URL_BASE + "/?s=" + title;
         System.out.println("Url is: " + url);
         System.out.println("THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
-        myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray jsonArray = response.getJSONArray("Search");
-                            System.out.println(jsonArray.length());
-                            List<String> list = new ArrayList<String>();
-                            for(int i = 0; i < jsonArray.length(); i++) {
-                                StringBuilder sb = new StringBuilder();
-                                sb.append(jsonArray.getJSONObject(i).getString("Title"));
-                                sb.append(", ");
-                                sb.append(jsonArray.getJSONObject(i).getString("Year"));
-                                sb.append(", ");
-                                sb.append(jsonArray.getJSONObject(i).getString("Type"));
-                                sb.append(", ");
-                                sb.append(jsonArray.getJSONObject(i).getString("imdbID"));
-                                list.add(sb.toString().trim());
+                            if (response.getString(OMDB_SUCCESS).equals("True")) {
+                                Message msg = Message.obtain();
+                                Bundle data = new Bundle();
+                                data.putParcelableArrayList(MESSAGE_SEARCH_RESULT, parseSearchResponse(response));
+                                msg.setData(data);
+                                searchMessenger.send(msg);
                             }
-                            for(String entry : list) {
-                                System.out.println(entry);
-                                //fuer jeden Eintrag Info: title, year, id, type
-                                //id wollen wir natürlich nicht in der Liste zeigen
 
-
-                                //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
-                                //hier kommt das Request rein
-                                //fuer Liste mit /?s=string
-                                //fuer details zu film mit /?i=id von item
-
-                                //handler.handleMessage(title);
-
-                                    /*Intent in = new Intent(ACTION);
-                                    in.putExtra("resultCode", MainActivity.RESULT_OK);
-                                    in.putExtra("resultValue", "My Result Value. Passed in: " + title);
-                                    // Fire the broadcast with intent packaged
-                                    LocalBroadcastManager.getInstance(this).sendBroadcast;*/
-
-                            }
-                            //System.out.println(jsonArray.toString());
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } catch (JSONException jse) {
+                            jse.printStackTrace();
+                        } catch (RemoteException re) {
+                            re.printStackTrace();
                         }
-                        //String responseString = response.toString();
-
-                        //System.out.println(responseString);
-                        //stattdessen hier nur den Titel ausgeben
-                        //GSON benutzen
                     }
                 },
                 new Response.ErrorListener() {
@@ -191,58 +163,52 @@ public class MyIntentService extends IntentService {
                         }
                     }
                 });
-
+        queue.add(myRequest);
     }
+
+    private ArrayList<Movie> parseSearchResponse(JSONObject response) throws JSONException {
+        JSONArray moviesJSON = response.getJSONArray(OMDB_SEARCH_RESULT);
+        ArrayList<Movie> movies = new ArrayList<>();
+        for (int i = 0; i < moviesJSON.length(); i++) {
+            JSONObject movieJSON = moviesJSON.getJSONObject(i);
+            String imdbID = movieJSON.getString(OMDB_ID);
+            String title = movieJSON.getString(OMDB_TITLE);
+            String year = movieJSON.getString(OMDB_YEAR);
+            String type = movieJSON.getString(OMDB_TYPE);
+            movies.add(new Movie(imdbID, title, year, type));
+        }
+        return movies;
+    }
+
 
     /**
      * Handle action getDetails in the provided background thread
      */
 
-    private void handleActionGetDetails() {
+    private void handleActionGetDetails(String imdbid) {
+        String url = URL_BASE + "/?i=" + imdbid;
         System.out.println("Url is: " + url);
         System.out.println("THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
 
-        myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest detailsRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            //JSONObject jsonObject = response.getJSONObject(null);
-                            //System.out.println(jsonObject.length());
-                            List<String> list = new ArrayList<String>();
-                            list.add(response.getString("Title"));
-                            list.add(response.getString("Genre"));
-                            list.add(response.getString("Writer"));
-                            list.add(response.getString("Actors"));
-
-                            for(String title : list) {
-                                System.out.println(title);
-
-                                //hier den Handler aufrufen, mit dem dann die Daten an UI Thread posten
-                                //hier kommt das Request rein
-                                //fuer Liste mit /?s=string
-                                //fuer details zu film mit /?i=id von item
-
-                                //handler.handleMessage(title);
-
-                                    /*Intent in = new Intent(ACTION);
-                                    in.putExtra("resultCode", MainActivity.RESULT_OK);
-                                    in.putExtra("resultValue", "My Result Value. Passed in: " + title);
-                                    // Fire the broadcast with intent packaged
-                                    LocalBroadcastManager.getInstance(this).sendBroadcast;*/
-
+                            if (response.getString(OMDB_SUCCESS).equals("True")) {
+                                Message msg = Message.obtain();
+                                Bundle data = new Bundle();
+                                data.putParcelable(MESSAGE_DETAILS, parseDetailsResponse(response));
+                                msg.setData(data);
+                                detailsMessenger.send(msg);
                             }
-                            //System.out.println(jsonArray.toString());
-
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
                         }
-                        //String responseString = response.toString();
-
-                        //System.out.println(responseString);
-                        //stattdessen hier nur den Titel ausgeben
-                        //GSON benutzen
                     }
                 },
                 new Response.ErrorListener() {
@@ -257,8 +223,26 @@ public class MyIntentService extends IntentService {
                         }
                     }
                 });
+        queue.add(detailsRequest);
 
     }
+
+    private Movie parseDetailsResponse(JSONObject response) throws JSONException {
+        String imdbID = response.getString(OMDB_ID);
+        String title = response.getString(OMDB_TITLE);
+        String year = response.getString(OMDB_YEAR);
+        String rated = response.getString(OMDB_RATED);
+        String released = response.getString(OMDB_RELEASED);
+        String runtime = response.getString(OMDB_RUNTIME);
+        String genre = response.getString(OMDB_GENRE);
+        String director = response.getString(OMDB_DIRECTOR);
+        String writer = response.getString(OMDB_WRITER);
+        String actors = response.getString(OMDB_ACTORS);
+        String plot = response.getString(OMDB_PLOT);
+        String type = response.getString(OMDB_TYPE);
+        return new Movie(imdbID, title, year, rated, released, runtime, genre, director, writer, actors, plot, type);
+    }
+
 
     @Override
     public void onDestroy() {
