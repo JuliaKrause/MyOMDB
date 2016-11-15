@@ -41,7 +41,6 @@ public class MovieListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         Movie movie = (Movie) getListAdapter().getItem(position);
-        //intent.setAction(ACTION_GET_DETAILS)
         Intent intent = new Intent(MainBroadcastReceiver.ACTION_GET_DETAILS);
         intent.putExtra(MainBroadcastReceiver.EXTRA_IMDBID, movie.getImdbID());
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);

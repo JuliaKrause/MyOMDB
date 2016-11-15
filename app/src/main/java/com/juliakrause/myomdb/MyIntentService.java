@@ -88,7 +88,6 @@ public class MyIntentService extends IntentService {
             Intent intent = new Intent(MainBroadcastReceiver.ACTION_LOAD_DETAILS);
             intent.putParcelableArrayListExtra(MainBroadcastReceiver.EXTRA_MOVIE, movieList);
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-           // getApplicationContext().prepareDetails(movie);
         }
     }
 

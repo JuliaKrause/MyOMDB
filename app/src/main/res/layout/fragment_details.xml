@@ -16,6 +16,12 @@
                 android:layout_span="2"
                 android:text="@string/movieTitle"
                 android:textStyle="bold" />
+                <Button
+                    android:id = "@+id/addToWatchList"
+                    android:text = "+ WATCH"/>
+                <Button
+                    android:id = "@+id/addToFavorites"
+                    android:text = "+ LIKE"/>
         </TableRow>
         <TableRow>
             <TextView

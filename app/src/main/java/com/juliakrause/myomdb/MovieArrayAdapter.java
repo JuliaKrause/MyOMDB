@@ -26,13 +26,11 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         ViewHolder viewHolder;
 
         if (convertView == null) {
-            System.out.println(getContext());
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_movie_list_item, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
-            viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
             viewHolder.tvType = (TextView) convertView.findViewById(R.id.tvType);
-            System.out.println(convertView.findViewById(R.id.tvTitle));
+            viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
 
             convertView.setTag(viewHolder);
         } else {
@@ -41,10 +39,9 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
 
         Movie movie = getItem(position);
         if (movie != null) {
-            System.out.println(movie.getTitle());
             viewHolder.tvTitle.setText(movie.getTitle());
+            viewHolder.tvType.setText('(' + movie.getType() + ')');
             viewHolder.tvYear.setText(movie.getYear());
-            viewHolder.tvType.setText(movie.getType());
         }
         return convertView;
     }

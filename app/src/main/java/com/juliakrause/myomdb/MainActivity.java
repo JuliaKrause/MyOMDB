@@ -15,12 +15,8 @@ import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
 import android.widget.TextView;
 
-//TODO: get result of search into list fragment
-//TODO: start detail search from event listener in list
-//TODO: display result of detail search in detail fragment
 //TODO: make github repo
 //TODO: do something to test that different tab shows different list
-//TODO: e.g. favorites tab could show dummy list or such
 
 //TODO: now the time for local data has come
 //TODO: do not freak out because after a month of this, you're still only done with part 1
@@ -37,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     private MainBroadcastReceiver receiver;
     private SearchView searchView;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +45,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        fragmentManager = getFragmentManager();
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        tabLayout.addOnTabSelectedListener(new TabListener());
+        tabLayout.addOnTabSelectedListener(new TabListener(fragmentManager));
 
-        String tab1 = getResources().getString(R.string.tab1);
-        String tab2 = getResources().getString(R.string.tab2);
-        String tab3 = getResources().getString(R.string.tab3);
+        String movies = getResources().getString(R.string.tab1);
+        String watchList = getResources().getString(R.string.tab2);
+        String favorites = getResources().getString(R.string.tab3);
 
-        tabLayout.addTab(tabLayout.newTab().setText(tab1));
-        tabLayout.addTab(tabLayout.newTab().setText(tab2));
-        tabLayout.addTab(tabLayout.newTab().setText(tab3));
+        tabLayout.addTab(tabLayout.newTab().setText(movies));
+        tabLayout.addTab(tabLayout.newTab().setText(watchList));
+        tabLayout.addTab(tabLayout.newTab().setText(favorites));
 
         receiver = new MainBroadcastReceiver(this);
+
     }
 
     //in onResume(), bind activity to services, manipulate fragments, register broadcast receiver
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     public void prepareList() {
-        FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Fragment movieList = fragmentManager.findFragmentByTag(FRAGMENT_TAG_LIST);
