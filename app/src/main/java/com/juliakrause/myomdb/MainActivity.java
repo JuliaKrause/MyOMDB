@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
 
     }
+
     public void getDetails(String imdbID) {
         System.out.println("Movie ID is: " + imdbID);
         Intent intent = new Intent(this, MyIntentService.class);
