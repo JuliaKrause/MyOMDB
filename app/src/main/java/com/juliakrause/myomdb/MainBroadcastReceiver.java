@@ -11,10 +11,10 @@ import java.util.ArrayList;
  */
 public class MainBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.MyBroadcastReceiver.ACTION.GET_DETAILS";
-    public static final String EXTRA_IMDBID = "com.juliakrause.myomdb.MyBroadcastReceiver.extra.IMDBID";
-	public static final String ACTION_LOAD_DETAILS = "com.juliakrause.myomdb.MyBroadcastReceiver.ACTION.LOAD_DETAILS";
-	public static final String EXTRA_MOVIE = "com.juliakrause.myomdb.MyBroadcastReceiver.extra.MOVIE";
+    public static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.MainBroadcastReceiver.ACTION.GET_DETAILS";
+    public static final String EXTRA_IMDBID = "com.juliakrause.myomdb.MainBroadcastReceiver.extra.IMDBID";
+	public static final String ACTION_LOAD_DETAILS = "com.juliakrause.myomdb.MainBroadcastReceiver.ACTION.LOAD_DETAILS";
+	public static final String EXTRA_MOVIE = "com.juliakrause.myomdb.MainBroadcastReceiver.extra.MOVIE";
 
 	private MainActivity mainActivity;
     

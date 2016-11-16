@@ -1,10 +1,14 @@
 package com.juliakrause.myomdb;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 
+import static android.R.attr.id;
 import static com.juliakrause.myomdb.MainActivity.FRAGMENT_TAG_LIST;
 
 /**
@@ -13,11 +17,25 @@ import static com.juliakrause.myomdb.MainActivity.FRAGMENT_TAG_LIST;
 
 public class TabListener implements TabLayout.OnTabSelectedListener {
 
+    protected static final String FRAGMENT_TAG_WATCHLIST = "com.juliakrause.myomdb.fragment.tag.WATCHLIST";
     private FragmentManager fm;
+    private Activity mainActivity;
 
-    public TabListener(FragmentManager fm) {
+    private void sendBroadcastForWatchList() {
+        Intent intent = new Intent(ToWatchListFragmentBroadcastReceiver.ACTION_SHOW_TO_WATCH_LIST);
+        LocalBroadcastManager.getInstance(mainActivity.getApplicationContext()).sendBroadcast(intent);
+        /*okay, I can send a broadcast from here to the MainBroadcastReceiver,
+        but not to the ToWatchListFragmentBroadcastReceiver
+        but the view has been created and inflated and the ToWatchListFragmentBroadcastReceiver was created
+         */
+        //Intent intent = new Intent(MainBroadcastReceiver.ACTION_GET_DETAILS);
+        //LocalBroadcastManager.getInstance(mainActivity.getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public TabListener(Activity mainActivity, FragmentManager fm) {
         super();
         this.fm = fm;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -35,10 +53,21 @@ public class TabListener implements TabLayout.OnTabSelectedListener {
                 fragmentTransaction.replace(R.id.fragment_container, movieList, FRAGMENT_TAG_LIST);
                 //fragmentTransaction.commit();
             }
+        } else if (tabText.equals("WATCH LIST")) {
+            System.out.println("so far so good");
+            //fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            android.app.Fragment toWatchList = fm.findFragmentById(R.id.watchlist);
+            if (toWatchList == null) {
+                toWatchList = new ToWatchListFragment();
+            }
+            if (!toWatchList.isAdded()) {
+                //fragmentTransaction.add(R.id.fragment_container, toWatchList);
+                fragmentTransaction.replace(R.id.fragment_container, toWatchList);
+                fragmentTransaction.commit();
+                sendBroadcastForWatchList();
+            }
         }
-        //muss eventuell auch noch FragmentTransaction ft uebergeben kriegen
-        //ft.replace(R.id.somefragmentid, someFragment);
-        // DO NOT COMMIT THE TRANSACTION!
     }
 
     @Override

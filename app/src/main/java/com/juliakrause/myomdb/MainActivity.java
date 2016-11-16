@@ -9,18 +9,10 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
-import android.net.Uri;
 import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
 import android.widget.TextView;
-
-//TODO: make github repo
-//TODO: do something to test that different tab shows different list
-
-//TODO: now the time for local data has come
-//TODO: do not freak out because after a month of this, you're still only done with part 1
-//TODO: find out where these lines come from:
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -29,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private static final String EXTRA_TITLE = "com.juliakrause.myomdb.extra.TITLE";
     private static final String EXTRA_IMDBID = "com.juliakrause.myomdb.extra.IMDBID";
     protected static final String FRAGMENT_TAG_LIST = "com.juliakrause.myomdb.fragment.tag.LIST";
+
     protected static final String FRAGMENT_TAG_DETAILS = "com.juliakrause.myomdb.fragment.tag.DETAILS";
 
     private MainBroadcastReceiver receiver;
@@ -48,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         fragmentManager = getFragmentManager();
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        tabLayout.addOnTabSelectedListener(new TabListener(fragmentManager));
+        tabLayout.addOnTabSelectedListener(new TabListener(this, fragmentManager));
 
         String movies = getResources().getString(R.string.tab1);
         String watchList = getResources().getString(R.string.tab2);
