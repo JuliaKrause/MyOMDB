@@ -14,6 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+//TODO: I do not have a backstack for the fragments
+//TODO: greenDAO
+
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private static final String ACTION_SEARCHOMDB = "com.juliakrause.myomdb.action.SEARCHOMDB";
@@ -27,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private MainBroadcastReceiver receiver;
     private SearchView searchView;
     private FragmentManager fragmentManager;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         fragmentManager = getFragmentManager();
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+        tabLayout = (TabLayout) findViewById(R.id.tablayout);
         tabLayout.addOnTabSelectedListener(new TabListener(this, fragmentManager));
 
         String movies = getResources().getString(R.string.tab1);
@@ -52,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         tabLayout.addTab(tabLayout.newTab().setText(favorites));
 
         receiver = new MainBroadcastReceiver(this);
-
     }
 
     //in onResume(), bind activity to services, manipulate fragments, register broadcast receiver
@@ -63,9 +68,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainBroadcastReceiver.ACTION_GET_DETAILS);
         filter.addAction(MainBroadcastReceiver.ACTION_LOAD_DETAILS);
+        filter.addAction(MainBroadcastReceiver.ACTION_WATCHLIST);
+        filter.addAction(MainBroadcastReceiver.ACTION_FAVORITES);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(this);
+
     }
 
     //in onPause(), persist data and unbind services, unregister broadcast receiver
@@ -105,12 +114,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DetailsFragment details = DetailsFragment.newInstance(movie);
         fragmentTransaction.replace(R.id.fragment_container, details, FRAGMENT_TAG_DETAILS);
-        fragmentTransaction.addToBackStack(null);
+        //fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        tabLayout.getTabAt(0).select();
         prepareList();
         System.out.println("Query is: " + query);
         Intent intent = new Intent(this, MyIntentService.class);
@@ -118,6 +128,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         intent.putExtra(EXTRA_TITLE, query);
         startService(intent);
         return true;
+    }
+
+    public void prepareWatchList(ArrayList<Movie> moviesToWatch) {
+        Intent intent = new Intent(ToWatchListFragmentBroadcastReceiver.ACTION_SHOW_TO_WATCH_LIST);
+        intent.putParcelableArrayListExtra(ToWatchListFragmentBroadcastReceiver.EXTRA_MOVIES_TO_WATCH, moviesToWatch);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public void prepareFavoritesList(ArrayList<Movie> favoriteMovies) {
+        Intent intent = new Intent(FavoritesFragmentBroadcastReceiver.ACTION_SHOW_FAVORITES);
+        intent.putParcelableArrayListExtra(FavoritesFragmentBroadcastReceiver.EXTRA_FAVORITES, favoriteMovies);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override

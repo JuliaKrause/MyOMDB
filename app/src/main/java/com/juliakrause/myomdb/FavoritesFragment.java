@@ -31,10 +31,8 @@ public class FavoritesFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
         Button deleteButton = (Button) (view.findViewById(R.id.deleteFromFavorites));
-        System.out.println("Just created the delete button");
         listAdapter = new FavoritesArrayAdapter(getContext(), favoriteMovies);
         setListAdapter(listAdapter);
-        System.out.println("Are we there yet?");
         return view;
     }
 
@@ -44,14 +42,13 @@ public class FavoritesFragment extends ListFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction(FavoritesFragmentBroadcastReceiver.ACTION_SHOW_FAVORITES);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, filter);
-        System.out.println("Now we should have the broadcastreceiver we want to reach");
     }
 
     @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
-        System.out.println("in OnPause()");
+        System.out.println("in OnPause() of FavoritesFragment");
     }
 
     public void updateMovies(ArrayList<Movie> favoriteMovies) {

@@ -16,8 +16,6 @@ public class ToWatchListFragmentBroadcastReceiver extends BroadcastReceiver {
 
     ToWatchListFragment toWatchListFragment;
 
-    public ToWatchListFragmentBroadcastReceiver() {}
-
     public ToWatchListFragmentBroadcastReceiver(ToWatchListFragment toWatchListFragment) {
         this.toWatchListFragment = toWatchListFragment;
     }
