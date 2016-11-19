@@ -88,9 +88,11 @@ public class TabListener implements TabLayout.OnTabSelectedListener {
             sendBroadcastForWatchList();
         } else if (tabText.equals("FAVORITES")) {
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
-            android.app.Fragment favorites = fm.findFragmentById(R.id.favorites);
+            //android.app.Fragment favorites = fm.findFragmentById(R.id.favorites);
+            FavoritesFragment favorites = (FavoritesFragment) fm.findFragmentById(R.id.favorites);
             if (favorites == null) {
                 favorites = new FavoritesFragment();
+                favorites.setDaoSession(daoSession);
             }
             if (!favorites.isAdded()) {
                 fragmentTransaction.replace(R.id.fragment_container, favorites);

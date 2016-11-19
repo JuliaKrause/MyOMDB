@@ -9,12 +9,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.juliakrause.greendao.generated.DaoSession;
+import com.juliakrause.greendao.generated.MovieDao;
+
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class DetailsFragment extends Fragment {
 
     private static final String ARG_MOVIE = "com.juliakrause.myomdb.arg.MOVIE";
+
     private Movie movie;
+
+    private DaoSession daoSession;
+
+    public DaoSession getDaoSession() {
+        return daoSession;
+    }
+
+    public void setDaoSession(DaoSession daoSession) {
+        this.daoSession = daoSession;
+    }
 
     // Required empty public constructor
     public DetailsFragment() {}
@@ -49,26 +63,52 @@ public class DetailsFragment extends Fragment {
             ((TextView) (view.findViewById(R.id.tvWriter))).setText(movie.getWriter());
             ((TextView) (view.findViewById(R.id.tvActors))).setText(movie.getActors());
             ((TextView) (view.findViewById(R.id.tvPlot))).setText(movie.getPlot());
+
             Button watchButton = (Button) (view.findViewById(R.id.addToWatchList));
             View.OnClickListener watchListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast watchToast = new Toast(getContext()).makeText(getContext(), "movie will be added to watch list", LENGTH_SHORT);
-                    watchToast.show();
+                    MovieDao movieDao = daoSession.getMovieDao();
+                    com.juliakrause.greendao.generated.Movie dbMovie = new com.juliakrause.greendao.generated.Movie();
+                    dbMovie.setImdbId(movie.getImdbID());
+                    dbMovie.setTitle(movie.getTitle());
+                    dbMovie.setType(movie.getType());
+                    dbMovie.setYear(movie.getYear());
+                    dbMovie.setToWatch(1);
+                    try {
+                        movieDao.insert(dbMovie);
+                        Toast watchToast = new Toast(getContext()).makeText(getContext(), "Movie was added to Watchlist", LENGTH_SHORT);
+                        watchToast.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             };
             watchButton.setOnClickListener(watchListener);
+
             Button favoritesButton = (Button) (view.findViewById(R.id.addToFavorites));
             View.OnClickListener favoritesListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast favToast = new Toast(getContext()).makeText(getContext(), "movie will be added to favorites list", LENGTH_SHORT);
-                    favToast.show();
+                    MovieDao movieDao = daoSession.getMovieDao();
+                    com.juliakrause.greendao.generated.Movie dbMovie = new com.juliakrause.greendao.generated.Movie();
+                    dbMovie.setImdbId(movie.getImdbID());
+                    dbMovie.setTitle(movie.getTitle());
+                    dbMovie.setType(movie.getType());
+                    dbMovie.setYear(movie.getYear());
+                    dbMovie.setFavorite(1);
+                    try {
+                        movieDao.insert(dbMovie);
+                        Toast favToast = new Toast(getContext()).makeText(getContext(), "Movie was added to Favorites", LENGTH_SHORT);
+                        favToast.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             };
             favoritesButton.setOnClickListener(favoritesListener);
-
         }
+
         return view;
     }
 }

@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DetailsFragment details = DetailsFragment.newInstance(movie);
+        details.setDaoSession(daoSession);
         fragmentTransaction.replace(R.id.fragment_container, details, FRAGMENT_TAG_DETAILS);
         //fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
