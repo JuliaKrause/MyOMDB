@@ -27,8 +27,9 @@ public class MovieDao extends AbstractDao<Movie, Long> {
         public final static Property ImdbId = new Property(1, String.class, "imdbId", false, "IMDB_ID");
         public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
         public final static Property Type = new Property(3, String.class, "type", false, "TYPE");
-        public final static Property ToWatch = new Property(4, int.class, "toWatch", false, "TO_WATCH");
-        public final static Property Favorite = new Property(5, int.class, "favorite", false, "FAVORITE");
+        public final static Property Year = new Property(4, String.class, "year", false, "YEAR");
+        public final static Property ToWatch = new Property(5, int.class, "toWatch", false, "TO_WATCH");
+        public final static Property Favorite = new Property(6, int.class, "favorite", false, "FAVORITE");
     };
 
 
@@ -48,8 +49,9 @@ public class MovieDao extends AbstractDao<Movie, Long> {
                 "\"IMDB_ID\" TEXT NOT NULL ," + // 1: imdbId
                 "\"TITLE\" TEXT NOT NULL ," + // 2: title
                 "\"TYPE\" TEXT NOT NULL ," + // 3: type
-                "\"TO_WATCH\" INTEGER NOT NULL ," + // 4: toWatch
-                "\"FAVORITE\" INTEGER NOT NULL );"); // 5: favorite
+                "\"YEAR\" TEXT NOT NULL ," + // 4: year
+                "\"TO_WATCH\" INTEGER NOT NULL ," + // 5: toWatch
+                "\"FAVORITE\" INTEGER NOT NULL );"); // 6: favorite
     }
 
     /** Drops the underlying database table. */
@@ -70,8 +72,9 @@ public class MovieDao extends AbstractDao<Movie, Long> {
         stmt.bindString(2, entity.getImdbId());
         stmt.bindString(3, entity.getTitle());
         stmt.bindString(4, entity.getType());
-        stmt.bindLong(5, entity.getToWatch());
-        stmt.bindLong(6, entity.getFavorite());
+        stmt.bindString(5, entity.getYear());
+        stmt.bindLong(6, entity.getToWatch());
+        stmt.bindLong(7, entity.getFavorite());
     }
 
     /** @inheritdoc */
@@ -88,8 +91,9 @@ public class MovieDao extends AbstractDao<Movie, Long> {
             cursor.getString(offset + 1), // imdbId
             cursor.getString(offset + 2), // title
             cursor.getString(offset + 3), // type
-            cursor.getInt(offset + 4), // toWatch
-            cursor.getInt(offset + 5) // favorite
+            cursor.getString(offset + 4), // year
+            cursor.getInt(offset + 5), // toWatch
+            cursor.getInt(offset + 6) // favorite
         );
         return entity;
     }
@@ -101,8 +105,9 @@ public class MovieDao extends AbstractDao<Movie, Long> {
         entity.setImdbId(cursor.getString(offset + 1));
         entity.setTitle(cursor.getString(offset + 2));
         entity.setType(cursor.getString(offset + 3));
-        entity.setToWatch(cursor.getInt(offset + 4));
-        entity.setFavorite(cursor.getInt(offset + 5));
+        entity.setYear(cursor.getString(offset + 4));
+        entity.setToWatch(cursor.getInt(offset + 5));
+        entity.setFavorite(cursor.getInt(offset + 6));
      }
     
     /** @inheritdoc */

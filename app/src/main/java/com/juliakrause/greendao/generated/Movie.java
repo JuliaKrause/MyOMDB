@@ -13,6 +13,8 @@ public class Movie {
     private String title;
     /** Not-null value. */
     private String type;
+    /** Not-null value. */
+    private String year;
     private int toWatch;
     private int favorite;
 
@@ -23,11 +25,12 @@ public class Movie {
         this.id = id;
     }
 
-    public Movie(Long id, String imdbId, String title, String type, int toWatch, int favorite) {
+    public Movie(Long id, String imdbId, String title, String type, String year, int toWatch, int favorite) {
         this.id = id;
         this.imdbId = imdbId;
         this.title = title;
         this.type = type;
+        this.year = year;
         this.toWatch = toWatch;
         this.favorite = favorite;
     }
@@ -68,6 +71,16 @@ public class Movie {
     /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /** Not-null value. */
+    public String getYear() {
+        return year;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setYear(String year) {
+        this.year = year;
     }
 
     public int getToWatch() {

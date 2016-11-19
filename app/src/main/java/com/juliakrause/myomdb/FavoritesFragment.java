@@ -51,8 +51,9 @@ public class FavoritesFragment extends ListFragment {
         System.out.println("in OnPause() of FavoritesFragment");
     }
 
-    public void updateMovies(ArrayList<Movie> favoriteMovies) {
+    public void updateMovies() {
         this.favoriteMovies = favoriteMovies;
+        //siehe updateMovies method in ToWatchListFragment
         listAdapter.clear();
         listAdapter.addAll(this.favoriteMovies);
         listAdapter.notifyDataSetChanged();

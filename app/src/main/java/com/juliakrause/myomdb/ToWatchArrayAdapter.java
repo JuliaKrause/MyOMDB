@@ -8,15 +8,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.juliakrause.greendao.generated.*;
+
 import java.util.List;
 
 /**
  * Created by Julia on 13.11.2016.
  */
 
-public class ToWatchArrayAdapter extends ArrayAdapter<Movie> {
+public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.generated.Movie> {
 
-    public ToWatchArrayAdapter(Context context, List<Movie> objects) {
+    public ToWatchArrayAdapter(Context context, List<com.juliakrause.greendao.generated.Movie> objects) {
         super(context, 0, objects);
     }
 
@@ -37,7 +39,7 @@ public class ToWatchArrayAdapter extends ArrayAdapter<Movie> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Movie movie = getItem(position);
+        com.juliakrause.greendao.generated.Movie movie = getItem(position);
         if (movie != null) {
             viewHolder.tvTitle.setText(movie.getTitle());
             viewHolder.tvType.setText('(' + movie.getType() + ')');

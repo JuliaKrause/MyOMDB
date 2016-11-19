@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class ToWatchListFragmentBroadcastReceiver extends BroadcastReceiver {
     public static final String ACTION_SHOW_TO_WATCH_LIST = "com.juliakrause.myomdb.ACTION.SHOW_TO_WATCH_LIST";
-    public static final String EXTRA_MOVIES_TO_WATCH = "com.juliakrause.myomdb.extra.MOVIES_TO_WATCH";
+    //public static final String EXTRA_MOVIES_TO_WATCH = "com.juliakrause.myomdb.extra.MOVIES_TO_WATCH";
 
     ToWatchListFragment toWatchListFragment;
 
@@ -28,8 +28,8 @@ public class ToWatchListFragmentBroadcastReceiver extends BroadcastReceiver {
             final String action = intent.getAction();
             if (ACTION_SHOW_TO_WATCH_LIST.equals(action)) {
                 System.out.println("Here we are");
-                ArrayList<Movie> moviesToWatch = intent.getParcelableArrayListExtra(EXTRA_MOVIES_TO_WATCH);
-                toWatchListFragment.updateMovies(moviesToWatch);
+                //ArrayList<Movie> moviesToWatch = intent.getParcelableArrayListExtra(EXTRA_MOVIES_TO_WATCH);
+                toWatchListFragment.updateMovies();
             }
         }
     }

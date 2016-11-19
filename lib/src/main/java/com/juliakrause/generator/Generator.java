@@ -32,6 +32,7 @@ public class Generator {
         movie.addStringProperty("title").notNull();
         //movie.addStringProperty("title").notNull().index(); // setting an index
         movie.addStringProperty("type").notNull();
+        movie.addStringProperty("year").notNull();
         movie.addIntProperty("toWatch").notNull();
         movie.addIntProperty("favorite").notNull();
 
