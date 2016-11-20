@@ -17,11 +17,9 @@
                 android:text="@string/movieTitle"
                 android:textStyle="bold" />
                 <Button
-                    android:id = "@+id/addToWatchList"
-                    android:text = "+ WATCH"/>
+                    android:id = "@+id/addToWatchList" />
                 <Button
-                    android:id = "@+id/addToFavorites"
-                    android:text = "+ LIKE"/>
+                    android:id = "@+id/addToFavorites" />
         </TableRow>
         <TableRow>
             <TextView

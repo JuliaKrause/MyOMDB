@@ -38,10 +38,8 @@ public class MainBroadcastReceiver extends BroadcastReceiver {
 				ArrayList<Movie> movies = intent.getParcelableArrayListExtra(EXTRA_MOVIE);
 				mainActivity.prepareDetails(movies.get(0));
 			} else if (ACTION_WATCHLIST.equals(action)) {
-				//ArrayList<Movie> movies = intent.getParcelableArrayListExtra(EXTRA_MOVIES_WATCHLIST);
 				mainActivity.prepareWatchList();
 			} else if (ACTION_FAVORITES.equals(action)) {
-				//ArrayList<Movie> movies = intent.getParcelableArrayListExtra(EXTRA_MOVIES_FAVORITES);
 				mainActivity.prepareFavoritesList();
 			}
 		}

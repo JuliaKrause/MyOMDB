@@ -75,12 +75,12 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MovieDao movieDao = daoSession.getMovieDao();
-                    movie.setToWatch(0);
-                    movieDao.update(movie);
-                    System.out.println(movieDao.getKey(movie));
+                MovieDao movieDao = daoSession.getMovieDao();
+                movie.setToWatch(0);
+                movieDao.update(movie);
+                System.out.println(movieDao.getKey(movie));
 
-                    wf.updateMovies();
+                wf.updateMovies();
                 }
             });
 
@@ -93,17 +93,17 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
             viewHolder.addButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MovieDao movieDao = daoSession.getMovieDao();
-                    if(movie.getFavorite() == 0) {
-                        movie.setFavorite(1);
-                    } else {
-                        movie.setFavorite(0);
-                    }
-                    movieDao.update(movie);
-                    wf.updateMovies();
+                MovieDao movieDao = daoSession.getMovieDao();
+                if(movie.getFavorite() == 0) {
+                    movie.setFavorite(1);
+                } else {
+                    movie.setFavorite(0);
+                }
+                movieDao.update(movie);
+                wf.updateMovies();
 
-                    Toast favToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
-                    favToast.show();
+                Toast favToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
+                favToast.show();
                 }
             });
 

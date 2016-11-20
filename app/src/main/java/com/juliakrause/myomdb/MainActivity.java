@@ -126,19 +126,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-    public void prepareList() {
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        Fragment movieList = fragmentManager.findFragmentByTag(FRAGMENT_TAG_LIST);
-        if (movieList == null) {
-            movieList = new MovieListFragment();
-        }
-        if (!movieList.isAdded()) {
-            fragmentTransaction.replace(R.id.fragment_container, movieList, FRAGMENT_TAG_LIST);
-            fragmentTransaction.commit();
-        }
-    }
-
     public void getDetails(String imdbID) {
         System.out.println("Movie ID is: " + imdbID);
         Intent intent = new Intent(this, MyIntentService.class);
@@ -148,20 +135,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     public void prepareDetails(Movie movie) {
-        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         DetailsFragment details = DetailsFragment.newInstance(movie);
         details.setDaoSession(daoSession);
         fragmentTransaction.replace(R.id.fragment_container, details, FRAGMENT_TAG_DETAILS);
-        //fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
         tabLayout.getTabAt(0).select();
-        prepareList();
-        System.out.println("Query is: " + query);
         Intent intent = new Intent(this, MyIntentService.class);
         intent.setAction(ACTION_SEARCHOMDB);
         intent.putExtra(EXTRA_TITLE, query);
@@ -171,13 +155,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     public void prepareWatchList() {
         Intent intent = new Intent(ToWatchListFragmentBroadcastReceiver.ACTION_SHOW_TO_WATCH_LIST);
-        //intent.putParcelableArrayListExtra(ToWatchListFragmentBroadcastReceiver.EXTRA_MOVIES_TO_WATCH, moviesToWatch);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void prepareFavoritesList() {
         Intent intent = new Intent(FavoritesFragmentBroadcastReceiver.ACTION_SHOW_FAVORITES);
-        //intent.putParcelableArrayListExtra(FavoritesFragmentBroadcastReceiver.EXTRA_FAVORITES, favoriteMovies);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
