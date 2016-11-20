@@ -12,6 +12,12 @@ import android.widget.Toast;
 import com.juliakrause.greendao.generated.DaoSession;
 import com.juliakrause.greendao.generated.MovieDao;
 
+import java.util.List;
+
+import de.greenrobot.dao.query.DeleteQuery;
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
+
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class DetailsFragment extends Fragment {
@@ -76,8 +82,18 @@ public class DetailsFragment extends Fragment {
                     dbMovie.setYear(movie.getYear());
                     dbMovie.setToWatch(1);
                     try {
-                        movieDao.insert(dbMovie);
-                        Toast watchToast = new Toast(getContext()).makeText(getContext(), "Movie was added to Watchlist", LENGTH_SHORT);
+                        QueryBuilder<com.juliakrause.greendao.generated.Movie> builder = movieDao.queryBuilder();
+                        builder.where(MovieDao.Properties.ImdbId.eq(dbMovie.getImdbId()));
+                        List<com.juliakrause.greendao.generated.Movie> list = builder.build().list();
+                        if(list.size() == 0) {
+                            movieDao.insert(dbMovie);
+                        } else if(list.size() == 1) {
+                            //movie already exists in local db
+                            long pk = list.get(0).getId();
+                            dbMovie.setId(pk);
+                            movieDao.update(dbMovie);
+                        }
+                        Toast watchToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
                         watchToast.show();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -98,11 +114,22 @@ public class DetailsFragment extends Fragment {
                     dbMovie.setYear(movie.getYear());
                     dbMovie.setFavorite(1);
                     try {
-                        movieDao.insert(dbMovie);
-                        Toast favToast = new Toast(getContext()).makeText(getContext(), "Movie was added to Favorites", LENGTH_SHORT);
-                        favToast.show();
+                        QueryBuilder<com.juliakrause.greendao.generated.Movie> builder = movieDao.queryBuilder();
+                        builder.where(MovieDao.Properties.ImdbId.eq(dbMovie.getImdbId()));
+                        List<com.juliakrause.greendao.generated.Movie> list = builder.build().list();
+                        if(list.size() == 0) {
+                            movieDao.insert(dbMovie);
+                        } else if(list.size() == 1) {
+                            //movie already exists in local db
+                            long pk = list.get(0).getId();
+                            dbMovie.setId(pk);
+                            movieDao.update(dbMovie);
+                        }
+                        Toast watchToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
+                        watchToast.show();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Toast favToast = new Toast(getContext()).makeText(getContext(), "added to Favorites", LENGTH_SHORT);
+                        favToast.show();
                     }
                 }
             };

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -17,6 +18,8 @@ import com.juliakrause.greendao.generated.Movie;
 import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.dao.query.WhereCondition;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * Created by Julia on 13.11.2016.
@@ -53,6 +56,7 @@ public class FavoritesArrayAdapter extends ArrayAdapter<com.juliakrause.greendao
             viewHolder.tvType = (TextView) convertView.findViewById(R.id.tvType);
             viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
             viewHolder.deleteButton = (Button) convertView.findViewById(R.id.deleteFromFavorites);
+            viewHolder.addButton = (Button) convertView.findViewById(R.id.addToWatchList);
 
             convertView.setTag(viewHolder);
         } else {
@@ -64,6 +68,7 @@ public class FavoritesArrayAdapter extends ArrayAdapter<com.juliakrause.greendao
             viewHolder.tvTitle.setText(movie.getTitle());
             viewHolder.tvType.setText('(' + movie.getType() + ')');
             viewHolder.tvYear.setText(movie.getYear());
+            final String plusMinus;
 
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -71,17 +76,31 @@ public class FavoritesArrayAdapter extends ArrayAdapter<com.juliakrause.greendao
                     MovieDao movieDao = daoSession.getMovieDao();
                     movie.setFavorite(0);
                     movieDao.update(movie);
-
-                    QueryBuilder<Movie> builder = movieDao.queryBuilder();
-                    WhereCondition condition1 = builder.or(MovieDao.Properties.Favorite.eq(null),
-                            MovieDao.Properties.Favorite.eq("0"));
-                    WhereCondition condition2 = builder.or(MovieDao.Properties.ToWatch.eq(null),
-                            MovieDao.Properties.ToWatch.eq("0"));
-                    builder.where(condition1, condition2);
-                    DeleteQuery<Movie> deleteQuery = builder.buildDelete();
-                    deleteQuery.executeDeleteWithoutDetachingEntities();
-
                     ff.updateMovies();
+                }
+            });
+
+            if(movie.getToWatch() == 0) {
+                viewHolder.addButton.setText("+ WATCH");
+            } else {
+                viewHolder.addButton.setText("- WATCH");
+            }
+
+            viewHolder.addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MovieDao movieDao = daoSession.getMovieDao();
+                    if(movie.getToWatch() == 0) {
+                        movie.setToWatch(1);
+                    } else {
+                        movie.setToWatch(0);
+                    }
+                    movieDao.update(movie);
+                    ff.updateMovies();
+
+                    Toast watchListToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
+                    watchListToast.show();
+
                 }
             });
         }
@@ -93,6 +112,7 @@ public class FavoritesArrayAdapter extends ArrayAdapter<com.juliakrause.greendao
         TextView tvYear;
         TextView tvType;
         Button deleteButton;
+        Button addButton;
     }
 
 }

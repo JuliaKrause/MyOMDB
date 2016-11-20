@@ -1,6 +1,7 @@
 package com.juliakrause.myomdb;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.juliakrause.greendao.generated.*;
@@ -59,6 +61,14 @@ public class FavoritesFragment extends ListFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction(FavoritesFragmentBroadcastReceiver.ACTION_SHOW_FAVORITES);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Movie movie = (Movie) getListAdapter().getItem(position);
+        Intent intent = new Intent(MainBroadcastReceiver.ACTION_GET_DETAILS);
+        intent.putExtra(MainBroadcastReceiver.EXTRA_IMDBID, movie.getImdbId());
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
     @Override

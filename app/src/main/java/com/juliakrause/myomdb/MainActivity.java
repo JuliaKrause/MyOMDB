@@ -19,7 +19,10 @@ import com.juliakrause.greendao.generated.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.LazyList;
+import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
 
 //TODO: I do not have a backstack for the fragments
 //TODO: greenDAO
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private DaoSession daoSession;
 
     // data access objects for our entities
-    //private MovieDao movieDao;
+    private MovieDao movieDao;
 
 
     private static final String ACTION_SEARCHOMDB = "com.juliakrause.myomdb.action.SEARCHOMDB";
@@ -57,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         databaseConnection = new DaoMaster.DevOpenHelper(this, DATABASE_NAME, null).getWritableDatabase();
         daoMaster = new DaoMaster(databaseConnection);
         daoSession = daoMaster.newSession(); // we can instantiate multiple sessions as well, sessions share the connection owned by the DaoMaster!
-        //movieDao = daoSession.getMovieDao();
+        movieDao = daoSession.getMovieDao();
+        movieDao.deleteAll();
 
         System.out.println("THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
@@ -65,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         fragmentManager = getFragmentManager();
 
@@ -102,7 +105,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     //in onPause(), persist data and unbind services, unregister broadcast receiver
     @Override public void onPause() {
         super.onPause();
-        //that's fine, but how do I persist data here?
+
+        //clean up local db
+        QueryBuilder<com.juliakrause.greendao.generated.Movie> builder = movieDao.queryBuilder();
+        WhereCondition condition1 = builder.or(MovieDao.Properties.Favorite.eq(null),
+                MovieDao.Properties.Favorite.eq("0"));
+        WhereCondition condition2 = builder.or(MovieDao.Properties.ToWatch.eq(null),
+                MovieDao.Properties.ToWatch.eq("0"));
+        builder.where(condition1, condition2);
+        DeleteQuery<com.juliakrause.greendao.generated.Movie> deleteQuery = builder.buildDelete();
+        deleteQuery.executeDeleteWithoutDetachingEntities();
+
         if (databaseConnection != null && databaseConnection.isOpen()) {
             databaseConnection.close(); // close db connection if it's open
         }

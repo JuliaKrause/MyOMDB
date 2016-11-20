@@ -1,6 +1,7 @@
 package com.juliakrause.myomdb;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,15 @@ public class ToWatchListFragment extends ListFragment {
     }
 
     @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Movie movie = (Movie) getListAdapter().getItem(position);
+        Intent intent = new Intent(MainBroadcastReceiver.ACTION_GET_DETAILS);
+        intent.putExtra(MainBroadcastReceiver.EXTRA_IMDBID, movie.getImdbId());
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+    }
+
+
+    @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
@@ -67,7 +78,6 @@ public class ToWatchListFragment extends ListFragment {
 
     public void updateMovies() {
         MovieDao movieDao = daoSession.getMovieDao();
-        //movieDao.deleteAll();
         List moviesToWatch = movieDao.queryBuilder().where(MovieDao.Properties.ToWatch.eq("1")).list();
         //List<com.juliakrause.greendao.generated.Movie> moviesToWatch = (ArrayList) movieDao.queryBuilder().listLazy();
         this.moviesToWatch = moviesToWatch;

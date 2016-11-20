@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.juliakrause.greendao.generated.*;
 import com.juliakrause.greendao.generated.Movie;
@@ -19,6 +20,8 @@ import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.Query;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.dao.query.WhereCondition;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * Created by Julia on 13.11.2016.
@@ -56,6 +59,7 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
             viewHolder.tvType = (TextView) convertView.findViewById(R.id.tvType);
             viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
             viewHolder.deleteButton = (Button) convertView.findViewById(R.id.deleteFromWatchList);
+            viewHolder.addButton = (Button) convertView.findViewById(R.id.addToFavoriteList);
 
             convertView.setTag(viewHolder);
         } else {
@@ -74,18 +78,35 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
                     MovieDao movieDao = daoSession.getMovieDao();
                     movie.setToWatch(0);
                     movieDao.update(movie);
+                    System.out.println(movieDao.getKey(movie));
 
-                    QueryBuilder<Movie> builder = movieDao.queryBuilder();
-                    WhereCondition condition1 = builder.or(MovieDao.Properties.Favorite.eq(null),
-                            MovieDao.Properties.Favorite.eq("0"));
-                    WhereCondition condition2 = builder.or(MovieDao.Properties.ToWatch.eq(null),
-                        MovieDao.Properties.ToWatch.eq("0"));
-                    builder.where(condition1, condition2);
-                    DeleteQuery<Movie> deleteQuery = builder.buildDelete();
-                    deleteQuery.executeDeleteWithoutDetachingEntities();
                     wf.updateMovies();
                 }
             });
+
+            if(movie.getFavorite() == 0) {
+                viewHolder.addButton.setText("+ LIKE");
+            } else {
+                viewHolder.addButton.setText("- LIKE");
+            }
+
+            viewHolder.addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MovieDao movieDao = daoSession.getMovieDao();
+                    if(movie.getFavorite() == 0) {
+                        movie.setFavorite(1);
+                    } else {
+                        movie.setFavorite(0);
+                    }
+                    movieDao.update(movie);
+                    wf.updateMovies();
+
+                    Toast favToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
+                    favToast.show();
+                }
+            });
+
         }
         return convertView;
     }
@@ -95,6 +116,7 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
         TextView tvYear;
         TextView tvType;
         Button deleteButton;
+        Button addButton;
     }
 
 }
