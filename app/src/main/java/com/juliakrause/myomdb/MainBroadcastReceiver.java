@@ -16,9 +16,7 @@ public class MainBroadcastReceiver extends BroadcastReceiver {
 	public static final String ACTION_LOAD_DETAILS = "com.juliakrause.myomdb.MainBroadcastReceiver.ACTION.LOAD_DETAILS";
 	public static final String EXTRA_MOVIE = "com.juliakrause.myomdb.MainBroadcastReceiver.extra.MOVIE";
 	public static final String ACTION_WATCHLIST = "com.juliakrause.myomdb.MainBroadcastReceiver.ACTION.WATCHLIST";
-	//public static final String EXTRA_MOVIES_WATCHLIST = "com.juliakrause.myomdb.MainBroadcastReceiver.extra.MOVIES_WATCHLIST";
 	public static final String ACTION_FAVORITES = "com.juliakrause.myomdb.MainBroadcastReceiver.ACTION.FAVORITES";
-	//public static final String EXTRA_MOVIES_FAVORITES = "com.juliakrause.myomdb.MainBroadcastReceiver.extra.MOVIES_FAVORITES";
 	private MainActivity mainActivity;
     
 	
@@ -28,8 +26,7 @@ public class MainBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("in onReceive method");
-		if (intent != null) {             
+        if (intent != null) {
 			final String action = intent.getAction();             
 			if (ACTION_GET_DETAILS.equals(action)) {
 				final String imdbID = intent.getStringExtra(EXTRA_IMDBID);                 

@@ -30,26 +30,32 @@ public class DetailsFragment extends Fragment {
 
     private MovieDao movieDao;
 
-    private List<com.juliakrause.greendao.generated.Movie> localMovieList;
-
-    public List<com.juliakrause.greendao.generated.Movie> getLocalMovieList() {
-        return localMovieList;
-    }
+    private com.juliakrause.greendao.generated.Movie localMovie;
 
     private Button watchButton;
 
     private Button favoritesButton;
 
-    public void setLocalMovieList(List<com.juliakrause.greendao.generated.Movie> localMovieList) {
-        this.localMovieList = localMovieList;
+    public void setLocalMovie() {
+        QueryBuilder<com.juliakrause.greendao.generated.Movie> builder = movieDao.queryBuilder();
+        builder.where(MovieDao.Properties.ImdbId.eq(movie.getImdbID()));
+        List<com.juliakrause.greendao.generated.Movie> list = builder.build().list();
+        if (list != null && list.size() > 0) {
+            this.localMovie = list.get(0);
+        }
+    }
+
+    public com.juliakrause.greendao.generated.Movie getLocalMovie() {
+        return localMovie;
     }
 
     public MovieDao getMovieDao() {
         return movieDao;
     }
 
-    public void setMovieDao(MovieDao movieDao) {
-        this.movieDao = movieDao;
+    public void setMovieDao() {
+
+        this.movieDao = this.daoSession.getMovieDao();
     }
 
     public DaoSession getDaoSession() {
@@ -80,13 +86,7 @@ public class DetailsFragment extends Fragment {
     }
 
     private Boolean localMovie() {
-        if(localMovieList != null) {
-            localMovieList.clear();
-        }
-        QueryBuilder<com.juliakrause.greendao.generated.Movie> builder = movieDao.queryBuilder();
-        builder.where(MovieDao.Properties.ImdbId.eq(movie.getImdbID()));
-        localMovieList = builder.build().list();
-        if(localMovieList.size() == 0) {
+        if(localMovie == null) {
             return false;
         } else {
             return true;
@@ -102,15 +102,38 @@ public class DetailsFragment extends Fragment {
         return dbMovie;
     }
 
+    private Boolean isFavorite() {
+        if(!localMovie()) {
+            return false;
+        } else {
+            if(localMovie.getFavorite() == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private Boolean isOnToWatchList() {
+        if(!localMovie()) {
+            return false;
+        } else {
+            if(localMovie.getToWatch() == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     private void updateButtons() {
-        Boolean localMovie = localMovie();
-        if(!localMovie || localMovieList.get(0).getToWatch() == 0) {
+        if(!isOnToWatchList()) {
             watchButton.setText("+ WATCH");
         } else {
             watchButton.setText("- WATCH");
         }
 
-        if(!localMovie || localMovieList.get(0).getFavorite() == 0) {
+        if(!isFavorite()) {
             favoritesButton.setText("+ LIKE");
         } else {
             favoritesButton.setText("- LIKE");
@@ -136,7 +159,7 @@ public class DetailsFragment extends Fragment {
 
             movieDao = daoSession.getMovieDao();
             final com.juliakrause.greendao.generated.Movie dbMovie = prepareMovie();
-
+            setLocalMovie();
             updateButtons();
 
             View.OnClickListener watchListener = new View.OnClickListener() {
@@ -148,9 +171,9 @@ public class DetailsFragment extends Fragment {
                             movieDao.insert(dbMovie);
                         } else {
                             //movie already exists in local db
-                            long pk = localMovieList.get(0).getId();
+                            long pk = localMovie.getId();
                             dbMovie.setId(pk);
-                            if(localMovieList.get(0).getToWatch() == 0) {
+                            if(!isOnToWatchList()) {
                                 dbMovie.setToWatch(1);
                             } else {
                                 dbMovie.setToWatch(0);
@@ -158,6 +181,7 @@ public class DetailsFragment extends Fragment {
 
                             movieDao.update(dbMovie);
                         }
+                        setLocalMovie();
                         updateButtons();
                         Toast watchToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
                         watchToast.show();
@@ -178,15 +202,16 @@ public class DetailsFragment extends Fragment {
                             movieDao.insert(dbMovie);
                         } else {
                             //movie already exists in local db
-                            long pk = localMovieList.get(0).getId();
+                            long pk = localMovie.getId();
                             dbMovie.setId(pk);
-                            if(localMovieList.get(0).getFavorite() == 0) {
+                            if(!isFavorite()) {
                                 dbMovie.setFavorite(1);
                             } else {
                                 dbMovie.setFavorite(0);
                             }
                             movieDao.update(dbMovie);
                         }
+                        setLocalMovie();
                         updateButtons();
                         Toast watchToast = new Toast(getContext()).makeText(getContext(), "OK", LENGTH_SHORT);
                         watchToast.show();

@@ -61,9 +61,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         daoMaster = new DaoMaster(databaseConnection);
         daoSession = daoMaster.newSession(); // we can instantiate multiple sessions as well, sessions share the connection owned by the DaoMaster!
         movieDao = daoSession.getMovieDao();
-        movieDao.deleteAll();
+        //movieDao.deleteAll();
 
-        System.out.println("THREAD IS: ");
+        System.out.println("In MainActivity.OnCreate(), THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
 
         setContentView(R.layout.activity_main);
@@ -121,13 +121,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        System.out.println("THREAD IS: ");
+        System.out.println("In MainActivity.OnPause(), THREAD IS: ");
         System.out.println(Thread.currentThread().getId());
 
     }
 
     public void getDetails(String imdbID) {
-        System.out.println("Movie ID is: " + imdbID);
         Intent intent = new Intent(this, MyIntentService.class);
         intent.setAction(ACTION_GET_DETAILS);
         intent.putExtra(EXTRA_IMDBID, imdbID);

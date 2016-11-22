@@ -89,8 +89,8 @@ public class TabListener implements TabLayout.OnTabSelectedListener {
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-        String tabText = String.valueOf(tab.getText());
-        System.out.println("tab " + tabText + " was unselected: " + tab);
+        //String tabText = String.valueOf(tab.getText());
+        //System.out.println("tab " + tabText + " was unselected: " + tab);
 
     }
 

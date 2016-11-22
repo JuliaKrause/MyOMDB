@@ -68,7 +68,6 @@ public class FavoritesArrayAdapter extends ArrayAdapter<com.juliakrause.greendao
             viewHolder.tvTitle.setText(movie.getTitle());
             viewHolder.tvType.setText('(' + movie.getType() + ')');
             viewHolder.tvYear.setText(movie.getYear());
-            final String plusMinus;
 
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override

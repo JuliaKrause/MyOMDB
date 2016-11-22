@@ -62,11 +62,9 @@ public class ToWatchListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        System.out.println(position);
         Movie movie = (Movie) getListAdapter().getItem(position);
         Intent intent = new Intent(MainBroadcastReceiver.ACTION_GET_DETAILS);
         intent.putExtra(MainBroadcastReceiver.EXTRA_IMDBID, movie.getImdbId());
-        System.out.println(movie.getImdbId());
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
@@ -75,13 +73,11 @@ public class ToWatchListFragment extends ListFragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
-        System.out.println("in OnPause() of ToWatchListFragment");
     }
 
     public void updateMovies() {
         MovieDao movieDao = daoSession.getMovieDao();
         List moviesToWatch = movieDao.queryBuilder().where(MovieDao.Properties.ToWatch.eq("1")).list();
-        //List<com.juliakrause.greendao.generated.Movie> moviesToWatch = (ArrayList) movieDao.queryBuilder().listLazy();
         this.moviesToWatch = moviesToWatch;
         listAdapter.clear();
         listAdapter.addAll(this.moviesToWatch);

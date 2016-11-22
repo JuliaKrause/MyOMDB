@@ -75,14 +75,11 @@ public class FavoritesFragment extends ListFragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
-        System.out.println("in OnPause() of FavoritesFragment");
     }
 
     public void updateMovies() {
         MovieDao movieDao = daoSession.getMovieDao();
-        //movieDao.deleteAll();
         List favorites = movieDao.queryBuilder().where(MovieDao.Properties.Favorite.eq("1")).list();
-        //List<com.juliakrause.greendao.generated.Movie> moviesToWatch = (ArrayList) movieDao.queryBuilder().listLazy();
         this.favoriteMovies = favorites;
         listAdapter.clear();
         listAdapter.addAll(this.favoriteMovies);

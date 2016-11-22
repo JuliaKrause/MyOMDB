@@ -78,7 +78,6 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
                 MovieDao movieDao = daoSession.getMovieDao();
                 movie.setToWatch(0);
                 movieDao.update(movie);
-                System.out.println(movieDao.getKey(movie));
 
                 wf.updateMovies();
                 }

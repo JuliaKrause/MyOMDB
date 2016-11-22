@@ -53,7 +53,6 @@ public class MovieListFragment extends ListFragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
-        System.out.println("in OnPause() of MovieListFragment");
     }
 
     public void updateMovies(ArrayList<Movie> movies) {

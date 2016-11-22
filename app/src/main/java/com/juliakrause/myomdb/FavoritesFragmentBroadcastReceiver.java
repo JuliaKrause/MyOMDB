@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 public class FavoritesFragmentBroadcastReceiver extends BroadcastReceiver {
     public static final String ACTION_SHOW_FAVORITES = "com.juliakrause.myomdb.ACTION.SHOW_FAVORITES";
-    //public static final String EXTRA_FAVORITES = "com.juliakrause.myomdb.extra.FAVORITES";
 
     FavoritesFragment favoritesFragment;
 
@@ -25,12 +24,9 @@ public class FavoritesFragmentBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("IN THE FAVORITESFRAGMENTBROADCASTRECEIVER'S RECEIVE METHOD");
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_SHOW_FAVORITES.equals(action)) {
-                System.out.println("Here we are");
-                //ArrayList<Movie> favoriteMovies = intent.getParcelableArrayListExtra(EXTRA_FAVORITES);
                 favoritesFragment.updateMovies();
             }
         }

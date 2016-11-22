@@ -28,7 +28,6 @@ import java.util.concurrent.TimeoutException;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class MyIntentService extends IntentService {
@@ -37,7 +36,6 @@ public class MyIntentService extends IntentService {
     private static final String ACTION_GET_DETAILS = "com.juliakrause.myomdb.action.GET_DETAILS";
     private static final String EXTRA_TITLE = "com.juliakrause.myomdb.extra.TITLE";
     private static final String EXTRA_IMDBID = "com.juliakrause.myomdb.extra.IMDBID";
-    private static final String EXTRA_MESSENGER = "com.juliakrause.myomdb.extra.MESSENGER";
 
     private static final String OMDB_SUCCESS = "Response";
     private static final String OMDB_ID = "imdbID";
@@ -58,6 +56,7 @@ public class MyIntentService extends IntentService {
     public static final String MESSAGE_DETAILS = "com.juliakrause.myomdb.message.DETAILS";
 
     private static final String URL_BASE = "http://omdbapi.com";
+
     private Messenger detailsMessenger;
     private Messenger searchMessenger;
 
@@ -92,8 +91,8 @@ public class MyIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.out.println("This is the onCreate Method in the intentService--THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
+        //System.out.println("This is the onCreate Method in the intentService--THREAD IS: ");
+        //System.out.println(Thread.currentThread().getId());
 
         detailsMessenger = new Messenger(new DetailsHandler());
         searchMessenger = new Messenger(new SearchHandler());
@@ -236,16 +235,6 @@ public class MyIntentService extends IntentService {
         String plot = response.getString(OMDB_PLOT);
         String type = response.getString(OMDB_TYPE);
         return new Movie(imdbID, title, year, rated, released, runtime, genre, director, writer, actors, plot, type);
-    }
-
-
-    @Override
-    public void onDestroy() {
-        System.out.println("intent service is being destroyed");//weirdly, this happens before the sysout in the handle methods
-        System.out.println("THREAD IS: ");//is again the UI Thread
-        System.out.println(Thread.currentThread().getId());
-        super.onDestroy();
-
     }
 
 }
