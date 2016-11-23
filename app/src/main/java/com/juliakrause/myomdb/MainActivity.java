@@ -1,9 +1,6 @@
 package com.juliakrause.myomdb;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.view.View;
-import android.widget.Toast;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -14,18 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
-import android.widget.TextView;
 import com.juliakrause.greendao.generated.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.greenrobot.dao.query.DeleteQuery;
-import de.greenrobot.dao.query.LazyList;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.dao.query.WhereCondition;
 
-//TODO: I do not have a backstack for the fragments
-//TODO: greenDAO
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -45,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private static final String EXTRA_TITLE = "com.juliakrause.myomdb.extra.TITLE";
     private static final String EXTRA_IMDBID = "com.juliakrause.myomdb.extra.IMDBID";
     protected static final String FRAGMENT_TAG_LIST = "com.juliakrause.myomdb.fragment.tag.LIST";
-
     protected static final String FRAGMENT_TAG_DETAILS = "com.juliakrause.myomdb.fragment.tag.DETAILS";
 
     private MainBroadcastReceiver receiver;
@@ -59,12 +49,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         databaseConnection = new DaoMaster.DevOpenHelper(this, DATABASE_NAME, null).getWritableDatabase();
         daoMaster = new DaoMaster(databaseConnection);
-        daoSession = daoMaster.newSession(); // we can instantiate multiple sessions as well, sessions share the connection owned by the DaoMaster!
+        daoSession = daoMaster.newSession();
         movieDao = daoSession.getMovieDao();
         //movieDao.deleteAll();
-
-        System.out.println("In MainActivity.OnCreate(), THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -86,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         receiver = new MainBroadcastReceiver(this);
     }
 
-    //in onResume(), bind activity to services, manipulate fragments, register broadcast receiver
     @Override public void onResume() {
         super.onResume();
 
@@ -102,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-    //in onPause(), persist data and unbind services, unregister broadcast receiver
     @Override public void onPause() {
         super.onPause();
 
@@ -117,13 +102,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         deleteQuery.executeDeleteWithoutDetachingEntities();
 
         if (databaseConnection != null && databaseConnection.isOpen()) {
-            databaseConnection.close(); // close db connection if it's open
+            databaseConnection.close();
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        System.out.println("In MainActivity.OnPause(), THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
-
     }
 
     public void getDetails(String imdbID) {

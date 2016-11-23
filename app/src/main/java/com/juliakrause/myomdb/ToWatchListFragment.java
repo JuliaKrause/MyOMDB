@@ -35,9 +35,9 @@ public class ToWatchListFragment extends ListFragment {
         broadcastReceiver = new ToWatchListFragmentBroadcastReceiver(this);
     }
 
-    public DaoSession getDaoSession() {
+    /*public DaoSession getDaoSession() {
         return daoSession;
-    }
+    }*/
 
     public void setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

@@ -1,6 +1,5 @@
 package com.juliakrause.myomdb;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -15,11 +14,6 @@ import com.juliakrause.greendao.generated.*;
 import com.juliakrause.greendao.generated.Movie;
 
 import java.util.List;
-
-import de.greenrobot.dao.query.DeleteQuery;
-import de.greenrobot.dao.query.Query;
-import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -39,10 +33,6 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
         this.wf = wf;
     }
 
-    public DaoSession getDaoSession() {
-        return daoSession;
-    }
-
     public void setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
     }
@@ -55,9 +45,9 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_towatch_list_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
-            viewHolder.tvType = (TextView) convertView.findViewById(R.id.tvType);
-            viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
+            viewHolder.movieTitle = (TextView) convertView.findViewById(R.id.movieTitle);
+            viewHolder.movieType = (TextView) convertView.findViewById(R.id.movieType);
+            viewHolder.movieYear = (TextView) convertView.findViewById(R.id.movieYear);
             viewHolder.deleteButton = (Button) convertView.findViewById(R.id.deleteFromWatchList);
             viewHolder.addButton = (Button) convertView.findViewById(R.id.addToFavoriteList);
 
@@ -68,9 +58,9 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
 
         final Movie movie = getItem(position);
         if (movie != null) {
-            viewHolder.tvTitle.setText(movie.getTitle());
-            viewHolder.tvType.setText('(' + movie.getType() + ')');
-            viewHolder.tvYear.setText(movie.getYear());
+            viewHolder.movieTitle.setText(movie.getTitle());
+            viewHolder.movieType.setText('(' + movie.getType() + ')');
+            viewHolder.movieYear.setText(movie.getYear());
 
             viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -111,9 +101,9 @@ public class ToWatchArrayAdapter extends ArrayAdapter<com.juliakrause.greendao.g
     }
 
     private static class ViewHolder {
-        TextView tvTitle;
-        TextView tvYear;
-        TextView tvType;
+        TextView movieTitle;
+        TextView movieYear;
+        TextView movieType;
         Button deleteButton;
         Button addButton;
     }

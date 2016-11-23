@@ -21,14 +21,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p>
- * helper methods.
  */
 public class MyIntentService extends IntentService {
 
@@ -37,7 +33,7 @@ public class MyIntentService extends IntentService {
     private static final String EXTRA_TITLE = "com.juliakrause.myomdb.extra.TITLE";
     private static final String EXTRA_IMDBID = "com.juliakrause.myomdb.extra.IMDBID";
 
-    private static final String OMDB_SUCCESS = "Response";
+    private static final String OMDB_RESPONSE = "Response";
     private static final String OMDB_ID = "imdbID";
     private static final String OMDB_TITLE = "Title";
     private static final String OMDB_YEAR = "Year";
@@ -51,7 +47,6 @@ public class MyIntentService extends IntentService {
     private static final String OMDB_PLOT = "Plot";
     private static final String OMDB_TYPE = "Type";
     private static final String OMDB_SEARCH_RESULT = "Search";
-
     public static final String MESSAGE_SEARCH_RESULT = "com.juliakrause.myomdb.message.SEARCH_RESULT";
     public static final String MESSAGE_DETAILS = "com.juliakrause.myomdb.message.DETAILS";
 
@@ -86,22 +81,15 @@ public class MyIntentService extends IntentService {
         }
     }
 
-    //diese Methode läuft noch im UI Thread
-    //nur die onHandleIntent Methode läuft im Service Thread
     @Override
     public void onCreate() {
         super.onCreate();
-        //System.out.println("This is the onCreate Method in the intentService--THREAD IS: ");
-        //System.out.println(Thread.currentThread().getId());
-
         detailsMessenger = new Messenger(new DetailsHandler());
         searchMessenger = new Messenger(new SearchHandler());
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        System.out.println("this is the intent service's onHandleIntent method--THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
 
         if (intent != null) {
             final String action = intent.getAction();
@@ -121,16 +109,13 @@ public class MyIntentService extends IntentService {
      */
     private void handleActionSearch(String title) {
         String url = URL_BASE + "/?s=" + title;
-        System.out.println("Url is: " + url);
-        System.out.println("THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest myRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if (response.getString(OMDB_SUCCESS).equals("True")) {
+                            if (response.getString(OMDB_RESPONSE).equals("True")) {
                                 Message msg = Message.obtain();
                                 Bundle data = new Bundle();
                                 data.putParcelableArrayList(MESSAGE_SEARCH_RESULT, parseSearchResponse(response));
@@ -150,10 +135,10 @@ public class MyIntentService extends IntentService {
                     public void onErrorResponse(VolleyError error) {
                         if(error.networkResponse != null) {
                             if (error.networkResponse.statusCode == 404) {
-                                System.out.println("this is the error listener");
+                                System.out.println("not found");
                             }
                         } else {
-                            System.out.println("error.networkResponse is null");
+                            System.out.println("no connection");
                         }
                     }
                 });
@@ -181,17 +166,13 @@ public class MyIntentService extends IntentService {
 
     private void handleActionGetDetails(String imdbid) {
         String url = URL_BASE + "/?i=" + imdbid;
-        System.out.println("Url is: " + url);
-        System.out.println("THREAD IS: ");
-        System.out.println(Thread.currentThread().getId());
-
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest detailsRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if (response.getString(OMDB_SUCCESS).equals("True")) {
+                            if (response.getString(OMDB_RESPONSE).equals("True")) {
                                 Message msg = Message.obtain();
                                 Bundle data = new Bundle();
                                 data.putParcelable(MESSAGE_DETAILS, parseDetailsResponse(response));
@@ -210,10 +191,10 @@ public class MyIntentService extends IntentService {
                     public void onErrorResponse(VolleyError error) {
                         if(error.networkResponse != null) {
                             if (error.networkResponse.statusCode == 404) {
-                                System.out.println("this is the error listener");
+                                System.out.println("not found");
                             }
                         } else {
-                            System.out.println("error.networkResponse is null");
+                            System.out.println("no connection");
                         }
                     }
                 });

@@ -2,7 +2,6 @@ package com.juliakrause.myomdb;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +27,9 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_movie_list_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
-            viewHolder.tvType = (TextView) convertView.findViewById(R.id.tvType);
-            viewHolder.tvYear = (TextView) convertView.findViewById(R.id.tvYear);
+            viewHolder.movieTitle = (TextView) convertView.findViewById(R.id.movieTitle);
+            viewHolder.movieType = (TextView) convertView.findViewById(R.id.movieType);
+            viewHolder.movieYear = (TextView) convertView.findViewById(R.id.movieYear);
 
             convertView.setTag(viewHolder);
         } else {
@@ -39,17 +38,17 @@ public class MovieArrayAdapter extends ArrayAdapter<Movie> {
 
         Movie movie = getItem(position);
         if (movie != null) {
-            viewHolder.tvTitle.setText(movie.getTitle());
-            viewHolder.tvType.setText('(' + movie.getType() + ')');
-            viewHolder.tvYear.setText(movie.getYear());
+            viewHolder.movieTitle.setText(movie.getTitle());
+            viewHolder.movieType.setText('(' + movie.getType() + ')');
+            viewHolder.movieYear.setText(movie.getYear());
         }
         return convertView;
     }
 
     private static class ViewHolder {
-        TextView tvTitle;
-        TextView tvYear;
-        TextView tvType;
+        TextView movieTitle;
+        TextView movieYear;
+        TextView movieType;
     }
 
 }

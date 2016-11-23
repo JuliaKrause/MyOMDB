@@ -8,18 +8,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.juliakrause.greendao.generated.*;
 import com.juliakrause.greendao.generated.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.widget.Toast.LENGTH_SHORT;
 
 /**
  * Created by Julia on 16.11.2016.
@@ -39,9 +34,9 @@ public class FavoritesFragment extends ListFragment {
         broadcastReceiver = new FavoritesFragmentBroadcastReceiver(this);
     }
 
-    public DaoSession getDaoSession() {
+    /*public DaoSession getDaoSession() {
         return daoSession;
-    }
+    }*/
 
     public void setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

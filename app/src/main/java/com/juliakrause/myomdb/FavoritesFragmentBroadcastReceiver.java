@@ -15,12 +15,9 @@ public class FavoritesFragmentBroadcastReceiver extends BroadcastReceiver {
 
     FavoritesFragment favoritesFragment;
 
-    public FavoritesFragmentBroadcastReceiver() {}
-
     public FavoritesFragmentBroadcastReceiver(FavoritesFragment favoritesFragment) {
         this.favoritesFragment = favoritesFragment;
     }
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -31,5 +28,4 @@ public class FavoritesFragmentBroadcastReceiver extends BroadcastReceiver {
             }
         }
     }
-
 }

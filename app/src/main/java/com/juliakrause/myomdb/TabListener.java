@@ -37,8 +37,6 @@ public class TabListener implements TabLayout.OnTabSelectedListener {
         LocalBroadcastManager.getInstance(mainActivity.getApplicationContext()).sendBroadcast(intent);
     }
 
-
-
     public TabListener(Activity mainActivity, FragmentManager fm, DaoSession ds) {
         super();
         this.fm = fm;
@@ -89,8 +87,6 @@ public class TabListener implements TabLayout.OnTabSelectedListener {
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-        //String tabText = String.valueOf(tab.getText());
-        //System.out.println("tab " + tabText + " was unselected: " + tab);
 
     }
 

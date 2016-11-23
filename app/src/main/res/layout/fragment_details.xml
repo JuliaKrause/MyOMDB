@@ -3,23 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbarStyle="insideInset"
     tools:context="com.juliakrause.myomdb.DetailsFragment">
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:shrinkColumns="1">
         <TableRow>
+            <Button
+                android:id = "@+id/addToWatchList" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:id = "@+id/addToFavorites" />
+        </TableRow>
+        <TableRow>
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/movieTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:text="@string/movieTitle"
                 android:textStyle="bold" />
-                <Button
-                    android:id = "@+id/addToWatchList" />
-                <Button
-                    android:id = "@+id/addToFavorites" />
         </TableRow>
         <TableRow>
             <TextView
@@ -27,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieYear" />
             <TextView
-                android:id="@+id/tvYear"
+                android:id="@+id/movieYear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -38,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieRated" />
             <TextView
-                android:id="@+id/tvRated"
+                android:id="@+id/movieRated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -50,7 +55,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:text="@string/movieReleased" />
             <TextView
-                android:id="@+id/tvReleased"
+                android:id="@+id/movieReleased"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -61,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieRuntime" />
             <TextView
-                android:id="@+id/tvRuntime"
+                android:id="@+id/movieRuntime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -72,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieGenre" />
             <TextView
-                android:id="@+id/tvGenre"
+                android:id="@+id/movieGenre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -83,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieDirector" />
             <TextView
-                android:id="@+id/tvDirector"
+                android:id="@+id/movieDirector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -94,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieWriter" />
             <TextView
-                android:id="@+id/tvWriter"
+                android:id="@+id/movieWriter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -105,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/movieActors" />
             <TextView
-                android:id="@+id/tvActors"
+                android:id="@+id/movieActors"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
@@ -116,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/moviePlot" />
             <TextView
-                android:id="@+id/tvPlot"
+                android:id="@+id/moviePlot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />

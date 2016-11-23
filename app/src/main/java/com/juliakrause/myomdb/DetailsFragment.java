@@ -14,9 +14,7 @@ import com.juliakrause.greendao.generated.MovieDao;
 
 import java.util.List;
 
-import de.greenrobot.dao.query.DeleteQuery;
 import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -45,21 +43,9 @@ public class DetailsFragment extends Fragment {
         }
     }
 
-    public com.juliakrause.greendao.generated.Movie getLocalMovie() {
-        return localMovie;
-    }
-
-    public MovieDao getMovieDao() {
-        return movieDao;
-    }
-
     public void setMovieDao() {
 
         this.movieDao = this.daoSession.getMovieDao();
-    }
-
-    public DaoSession getDaoSession() {
-        return daoSession;
     }
 
     public void setDaoSession(DaoSession daoSession) {
@@ -144,16 +130,16 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_details, container, false);
         if (movie != null) {
-            ((TextView) (view.findViewById(R.id.tvTitle))).setText(movie.getTitle());
-            ((TextView) (view.findViewById(R.id.tvYear))).setText(movie.getYear());
-            ((TextView) (view.findViewById(R.id.tvRated))).setText(movie.getRated());
-            ((TextView) (view.findViewById(R.id.tvReleased))).setText(movie.getReleased());
-            ((TextView) (view.findViewById(R.id.tvRuntime))).setText(movie.getRuntime());
-            ((TextView) (view.findViewById(R.id.tvGenre))).setText(movie.getGenre());
-            ((TextView) (view.findViewById(R.id.tvDirector))).setText(movie.getDirector());
-            ((TextView) (view.findViewById(R.id.tvWriter))).setText(movie.getWriter());
-            ((TextView) (view.findViewById(R.id.tvActors))).setText(movie.getActors());
-            ((TextView) (view.findViewById(R.id.tvPlot))).setText(movie.getPlot());
+            ((TextView) (view.findViewById(R.id.movieTitle))).setText(movie.getTitle());
+            ((TextView) (view.findViewById(R.id.movieYear))).setText(movie.getYear());
+            ((TextView) (view.findViewById(R.id.movieRated))).setText(movie.getRated());
+            ((TextView) (view.findViewById(R.id.movieReleased))).setText(movie.getReleased());
+            ((TextView) (view.findViewById(R.id.movieRuntime))).setText(movie.getRuntime());
+            ((TextView) (view.findViewById(R.id.movieGenre))).setText(movie.getGenre());
+            ((TextView) (view.findViewById(R.id.movieDirector))).setText(movie.getDirector());
+            ((TextView) (view.findViewById(R.id.movieWriter))).setText(movie.getWriter());
+            ((TextView) (view.findViewById(R.id.movieActors))).setText(movie.getActors());
+            ((TextView) (view.findViewById(R.id.moviePlot))).setText(movie.getPlot());
             watchButton = (Button) (view.findViewById(R.id.addToWatchList));
             favoritesButton = (Button) (view.findViewById(R.id.addToFavorites));
 
