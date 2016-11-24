@@ -52,40 +52,39 @@ public class MyIntentService extends IntentService {
 
     private static final String URL_BASE = "http://omdbapi.com";
 
-    private Messenger detailsMessenger;
-    private Messenger searchMessenger;
+    private Handler searchHandler;
+    private Handler detailsHandler;
 
     public MyIntentService() {
         super("MyIntentService");
     }
 
-    private class SearchHandler extends Handler {
+    private class MyHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            ArrayList<Movie> movies = msg.getData().getParcelableArrayList(MESSAGE_SEARCH_RESULT);
-            Intent intent = new Intent(MovieListFragmentBroadcastReceiver.ACTION_SHOW_SEARCH_RESULT);
-            intent.putParcelableArrayListExtra(MovieListFragmentBroadcastReceiver.EXTRA_SEARCH_RESULT, movies);
+            Intent intent = new Intent();
+            if(msg.getData().containsKey(MESSAGE_SEARCH_RESULT)) {
+                ArrayList<Movie> movies;
+                movies = msg.getData().getParcelableArrayList(MESSAGE_SEARCH_RESULT);
+                intent.setAction(MovieListFragmentBroadcastReceiver.ACTION_SHOW_SEARCH_RESULT);
+                intent.putParcelableArrayListExtra(MovieListFragmentBroadcastReceiver.EXTRA_SEARCH_RESULT, movies);
+            } else if(msg.getData().containsKey(MESSAGE_DETAILS)) {
+                ArrayList<Movie> movieWithDetails = new ArrayList<>();
+                Movie movie = msg.getData().getParcelable(MESSAGE_DETAILS);
+                movieWithDetails.add(movie);
+                intent.setAction(MainBroadcastReceiver.ACTION_LOAD_DETAILS);
+                intent.putParcelableArrayListExtra(MainBroadcastReceiver.EXTRA_MOVIE, movieWithDetails);
+            }
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
         }
     }
 
-    private class DetailsHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            Movie movie = msg.getData().getParcelable(MESSAGE_DETAILS);
-            ArrayList<Movie> movieList = new ArrayList<>();
-            movieList.add(movie);
-            Intent intent = new Intent(MainBroadcastReceiver.ACTION_LOAD_DETAILS);
-            intent.putParcelableArrayListExtra(MainBroadcastReceiver.EXTRA_MOVIE, movieList);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        }
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        detailsMessenger = new Messenger(new DetailsHandler());
-        searchMessenger = new Messenger(new SearchHandler());
+        this.searchHandler = new MyHandler();
+        this.detailsHandler = new MyHandler();
     }
 
     @Override
@@ -120,7 +119,9 @@ public class MyIntentService extends IntentService {
                                 Bundle data = new Bundle();
                                 data.putParcelableArrayList(MESSAGE_SEARCH_RESULT, parseSearchResponse(response));
                                 msg.setData(data);
-                                searchMessenger.send(msg);
+
+                                Messenger myMessenger = new Messenger(searchHandler);
+                                myMessenger.send(msg);
                             }
 
                         } catch (JSONException jse) {
@@ -145,20 +146,6 @@ public class MyIntentService extends IntentService {
         queue.add(myRequest);
     }
 
-    private ArrayList<Movie> parseSearchResponse(JSONObject response) throws JSONException {
-        JSONArray moviesJSON = response.getJSONArray(OMDB_SEARCH_RESULT);
-        ArrayList<Movie> movies = new ArrayList<>();
-        for (int i = 0; i < moviesJSON.length(); i++) {
-            JSONObject movieJSON = moviesJSON.getJSONObject(i);
-            String imdbID = movieJSON.getString(OMDB_ID);
-            String title = movieJSON.getString(OMDB_TITLE);
-            String year = movieJSON.getString(OMDB_YEAR);
-            String type = movieJSON.getString(OMDB_TYPE);
-            movies.add(new Movie(imdbID, title, year, type));
-        }
-        return movies;
-    }
-
 
     /**
      * Handle action getDetails in the provided background thread
@@ -177,7 +164,9 @@ public class MyIntentService extends IntentService {
                                 Bundle data = new Bundle();
                                 data.putParcelable(MESSAGE_DETAILS, parseDetailsResponse(response));
                                 msg.setData(data);
-                                detailsMessenger.send(msg);
+
+                                Messenger myMessenger = new Messenger(detailsHandler);
+                                myMessenger.send(msg);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -200,6 +189,20 @@ public class MyIntentService extends IntentService {
                 });
         queue.add(detailsRequest);
 
+    }
+
+    private ArrayList<Movie> parseSearchResponse(JSONObject response) throws JSONException {
+        JSONArray moviesJSON = response.getJSONArray(OMDB_SEARCH_RESULT);
+        ArrayList<Movie> movies = new ArrayList<>();
+        for (int i = 0; i < moviesJSON.length(); i++) {
+            JSONObject movieJSON = moviesJSON.getJSONObject(i);
+            String imdbID = movieJSON.getString(OMDB_ID);
+            String title = movieJSON.getString(OMDB_TITLE);
+            String year = movieJSON.getString(OMDB_YEAR);
+            String type = movieJSON.getString(OMDB_TYPE);
+            movies.add(new Movie(imdbID, title, year, type));
+        }
+        return movies;
     }
 
     private Movie parseDetailsResponse(JSONObject response) throws JSONException {
